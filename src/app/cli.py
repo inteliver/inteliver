@@ -14,11 +14,7 @@ def print_startup_logo():
         Fore.GREEN + Style.BRIGHT + "v" + __template_version__ + Style.RESET_ALL
     )
     project_name = """inteliver\n"""
-    # other selected fonts
-    # isometric1
-    # alpha
-    # smisome1
-    # starwars
+
     logo = (
         Fore.CYAN
         + Style.BRIGHT

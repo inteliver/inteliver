@@ -19,3 +19,10 @@ tests
 scripts
 postman
 docs
+
+pdoc
+logs
+htmlcov
+dist
+build
+.vscode

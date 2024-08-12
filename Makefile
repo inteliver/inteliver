@@ -15,9 +15,9 @@ sort-deps:
 dev:
 	export PYTHONPATH=`pwd`/src && uvicorn app.main:app --reload
 
-# Run the service using the cli command api-service
+# Run the service using the cli command inteliver
 run:
-	api-service run
+	inteliver run
 
 # Run mypy for type checking, Run flake8 for linting
 lint:
@@ -37,10 +37,10 @@ summary:
 docker-build:
 	docker build -t inteliver-api:latest .
 
-# Run Docker container, mapping port 8080 from container to host
+# Run Docker container, mapping port 8000 from container to host
 # Change inteliver-api to your project name
 docker-run:
-	docker run --rm -ti -p 8080:8080 inteliver-api:latest
+	docker run --rm -ti -p 8000:8000 inteliver-api:latest
 
 # Run semantic-release for versioning without VCS release
 version:

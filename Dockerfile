@@ -11,15 +11,22 @@ COPY requirements.txt .
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# cmake required for dlib
+RUN apt update && apt upgrade -y && apt install -y cmake
+
 # Install project dependencies within the virtual environment
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Stage 2: Production Stage
 FROM python:3.11-slim
 
-# Installing make
-RUN apt update && apt upgrade -y && apt install -y make
-
+# Installing make libgl
+RUN apt update && apt upgrade -y && apt install -y \
+    make \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libpng-dev
+    
 # Set working directory in the container
 WORKDIR /app
 
@@ -34,10 +41,10 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN make install
 
 # Expose the port where the FastAPI app will run
-EXPOSE 8080
+EXPOSE 8000
 
 # Command to run the FastAPI app using Uvicorn or other ASGI servers
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # run the service using the cli
-CMD ["api-service", "run"]
+CMD ["inteliver", "run"]
