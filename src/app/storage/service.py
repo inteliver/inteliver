@@ -11,6 +11,9 @@ from minio.datatypes import Object as MinioObject
 from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
+from app.storage.constants import SUPPORTED_IMAGE_FORMATS
+
 # from app.storage.minio_client import minio_client
 from app.storage.exceptions import (
     InvalidImageFileException,
@@ -21,20 +24,15 @@ from app.storage.exceptions import (
 from app.storage.schemas import ObjectOut, ObjectStats, ObjectUploaded
 from app.users.service import UserService
 
-MINIO_ENDPOINT = "localhost:9000"
-MINIO_ACCESS_KEY = "minioadmin"
-MINIO_SECRET_KEY = "minioadmin"
-MINIO_SECURE = False
-
 SUPPORTED_IMAGE_FORMATS = ["JPEG", "WEBP", "PNG"]
 
 
 class MinIOService:
     client = Minio(
-        MINIO_ENDPOINT,
-        access_key=MINIO_ACCESS_KEY,
-        secret_key=MINIO_SECRET_KEY,
-        secure=MINIO_SECURE,
+        settings.minio_host,
+        access_key=settings.minio_root_user,
+        secret_key=settings.minio_root_password,
+        secure=settings.minio_secure,
     )
 
     @classmethod
