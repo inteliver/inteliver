@@ -22,7 +22,10 @@ async def on_startup(app: FastAPI):
     """
     logger.debug("Starting up the app...")
     # Register to services that needs to be created on startup
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        logger.error(f"Error on initializing postgres db. detail: {e}")
     return app
 
 
