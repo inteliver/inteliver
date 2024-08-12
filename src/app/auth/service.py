@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.constants import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     ALGORITHM,
-    EMAIL_VALIDATION_TOKEN_EXPIRE_MINUTES,
+    EMAIL_CONFIRMATION_TOKEN_EXPIRE_MINUTES,
     RESET_PASSWORD_TOKEN_EXPIRE_MINUTES,
     SECRET_KEY,
 )
@@ -220,7 +220,7 @@ class AuthService:
     def create_email_validation_token(
         user: UserOut,
         expires_delta: Optional[timedelta] = timedelta(
-            minutes=EMAIL_VALIDATION_TOKEN_EXPIRE_MINUTES
+            minutes=EMAIL_CONFIRMATION_TOKEN_EXPIRE_MINUTES
         ),
     ) -> str:
         """
