@@ -10,7 +10,7 @@
 # There are some restrictions on what makes a valid project name
 # specification here:
 # https://packaging.python.org/specifications/core-metadata/#name
-name = "inteliver-api"  # Required
+name = "inteliver"  # Required
 
 # Versions should comply with PEP 440:
 # https://www.python.org/dev/peps/pep-0440/
@@ -105,6 +105,13 @@ classifiers = [  # Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [ # Optional
 ]
+
+[project.urls]
+"Homepage" = "https://github.com/inteliver/inteliver"
+"Bug Tracker" = "https://github.com/inteliver/inteliver/issues"
+"Documentation" = "https://inteliver.github.io/inteliver/"
+"Source" = "https://github.com/inteliver/inteliver"
+
 
 [tool.setuptools.dynamic]
 # change this into __version__ in derived services

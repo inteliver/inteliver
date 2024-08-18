@@ -33,14 +33,12 @@ summary:
 	pygount --suffix=py  --format=summary .
 
 # Build Docker image with the project name specified
-# Change inteliver-api to your project name
 docker-build:
-	docker build -t inteliver-api:latest .
+	docker build -t inteliver:latest .
 
 # Run Docker container, mapping port 8000 from container to host
-# Change inteliver-api to your project name
 docker-run:
-	docker run --rm -ti -p 8000:8000 inteliver-api:latest
+	docker run --rm -ti -p 8000:8000 inteliver:latest
 
 # Run semantic-release for versioning without VCS release
 version:
@@ -74,7 +72,7 @@ install:
 	pip install . --upgrade
 
 uninstall:
-	pip uninstall inteliver-api -y
+	pip uninstall inteliver -y
 
 # Run tests and write the coverage in html format
 testz:
