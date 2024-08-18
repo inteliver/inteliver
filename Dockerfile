@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM python:3.11 AS builder
+FROM python:3.11-slim AS builder
 
 # Set working directory in the container
 WORKDIR /app
@@ -12,10 +12,12 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # cmake required for dlib
-RUN apt update && apt upgrade -y && apt install -y cmake
+RUN apt update && apt install -y --no-install-recommends cmake \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install project dependencies within the virtual environment
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && rm -rf /var/lib/apt/lists/*
 
 # Stage 2: Production Stage
 FROM python:3.11-slim
@@ -25,8 +27,9 @@ RUN apt update && apt upgrade -y && apt install -y \
     make \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    libpng-dev
-    
+    libpng-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set working directory in the container
 WORKDIR /app
 
@@ -42,9 +45,6 @@ RUN make install
 
 # Expose the port where the FastAPI app will run
 EXPOSE 8000
-
-# Command to run the FastAPI app using Uvicorn or other ASGI servers
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # run the service using the cli
 CMD ["inteliver", "run"]

@@ -26,3 +26,7 @@ htmlcov
 dist
 build
 .vscode
+.mypy_cache
+.pytest_cache
+.ruff_cache
+
