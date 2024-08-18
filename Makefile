@@ -19,7 +19,7 @@ dev:
 run:
 	inteliver run
 
-# Run mypy for type checking, Run flake8 for linting
+# Run mypy for type checking, Run ruff for linting
 lint:
 	mypy src/app
 	ruff check src/app

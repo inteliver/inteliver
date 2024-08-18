@@ -5,10 +5,8 @@ from uuid import UUID
 import jwt
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError
 from loguru import logger
-from passlib.context import CryptContext
-from pydantic import EmailStr, ValidationError
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.constants import (
@@ -27,12 +25,7 @@ from app.auth.exceptions import (
     PyJWTException,
     TokenFieldsValidationException,
 )
-from app.auth.schemas import (
-    EmailValidationToken,
-    PasswordChange,
-    PasswordResetToken,
-    TokenData,
-)
+from app.auth.schemas import PasswordChange, TokenData, TokenSub
 from app.auth.utils import get_password_hash, verify_password
 from app.config import settings
 from app.users.crud import UserCRUD
@@ -69,7 +62,7 @@ class AuthService:
         user = await UserCRUD.get_user_by_email(db, username)
         if not user:
             return None
-        if not verify_password(password, user.password):
+        if not verify_password(password, str(user.password)):
             return None
         return UserOut.model_validate(user)
 
@@ -92,7 +85,7 @@ class AuthService:
         if not user:
             raise UserNotFoundException(f"User with id {user_id} not found")
 
-        if not verify_password(password_change.current_password, user.password):
+        if not verify_password(password_change.current_password, str(user.password)):
             raise AuthenticationFailedException
 
         await UserCRUD.update_user_password(
@@ -145,16 +138,15 @@ class AuthService:
         """
         try:
             payload = AuthService.decode_jwt_token(token)
-            token_data = PasswordResetToken(
+            token_sub = TokenSub(
                 sub=payload.get("sub"),
-                exp=payload.get("exp"),
             )
         except ValidationError:
             raise TokenFieldsValidationException
 
-        user = await UserCRUD.get_user_by_id(db, token_data.sub)
+        user = await UserCRUD.get_user_by_id(db, token_sub.sub)
         if not user:
-            raise UserNotFoundException(f"User with id {token_data.sub} not found")
+            raise UserNotFoundException(f"User with id {token_sub.sub} not found")
 
         await UserCRUD.update_user_password(db, user, get_password_hash(new_password))
 
@@ -173,9 +165,9 @@ class AuthService:
         # Create user if it is not already exist
         try:
             new_user = await UserService.create_user(db, user)
-        except UserAlreadyExistsException as e:
+        except UserAlreadyExistsException:
             raise
-        except DatabaseException as e:
+        except DatabaseException:
             raise
 
         # Create and log validation token
@@ -202,16 +194,18 @@ class AuthService:
         """
         try:
             payload = AuthService.decode_jwt_token(email_validation.validation_token)
-            token_data = EmailValidationToken(
+            token_sub = TokenSub(
                 sub=payload.get("sub"),
-                exp=payload.get("exp"),
             )
         except ValidationError:
             raise TokenFieldsValidationException
 
         user = await UserCRUD.get_user_by_email(db, email_validation.email_username)
 
-        if not user.uid == token_data.sub:
+        if not user:
+            raise UserNotFoundException
+
+        if not user.uid == token_sub.sub:
             raise EmailValidationTokenException
 
         await UserCRUD.validate_user_email(db, user)
@@ -219,7 +213,7 @@ class AuthService:
     @staticmethod
     def create_email_validation_token(
         user: UserOut,
-        expires_delta: Optional[timedelta] = timedelta(
+        expires_delta: timedelta = timedelta(
             minutes=EMAIL_CONFIRMATION_TOKEN_EXPIRE_MINUTES
         ),
     ) -> str:
@@ -265,12 +259,14 @@ class AuthService:
         )
 
         # Send validation email (implement send_email function accordingly)
-        await AuthService.send_validation_email(user.email_username, validation_token)
+        await AuthService.send_validation_email(
+            str(user.email_username), validation_token
+        )
 
     @staticmethod
     def create_password_reset_token(
         user: User,
-        expires_delta: Optional[timedelta] = timedelta(
+        expires_delta: timedelta = timedelta(
             minutes=RESET_PASSWORD_TOKEN_EXPIRE_MINUTES
         ),
     ) -> str:
@@ -290,9 +286,7 @@ class AuthService:
     @staticmethod
     def create_access_token(
         data: dict,
-        expires_delta: Optional[timedelta] = timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        ),
+        expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     ):
         """
         Create a JWT token.

@@ -2,7 +2,6 @@ from typing import Any
 
 import cv2
 import numpy as np
-from loguru import logger
 from ultralytics import YOLO
 
 
@@ -143,7 +142,7 @@ class ObjectDetection:
         detections = self._detect(image)
 
         # Build object map
-        object_map = {}
+        object_map: dict = {}
         for x1, y1, x2, y2, label, confidence in detections:
             if label not in object_map:
                 object_map[label] = []

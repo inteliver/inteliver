@@ -1,4 +1,3 @@
-from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
@@ -41,11 +40,5 @@ class PasswordResetConfirm(BaseModel):
     new_password: str
 
 
-class PasswordResetToken(BaseModel):
+class TokenSub(BaseModel):
     sub: UUID
-    exp: datetime
-
-
-class EmailValidationToken(BaseModel):
-    sub: UUID
-    exp: datetime

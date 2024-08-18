@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi.responses import StreamingResponse
-from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import TokenData

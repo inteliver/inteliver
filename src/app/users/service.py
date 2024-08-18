@@ -1,6 +1,5 @@
 from uuid import UUID
 
-from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.utils import get_password_hash

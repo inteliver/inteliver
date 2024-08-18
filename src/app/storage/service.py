@@ -24,8 +24,6 @@ from app.storage.exceptions import (
 from app.storage.schemas import ObjectOut, ObjectStats, ObjectUploaded
 from app.users.service import UserService
 
-SUPPORTED_IMAGE_FORMATS = ["JPEG", "WEBP", "PNG"]
-
 
 class MinIOService:
     client = Minio(
@@ -71,9 +69,9 @@ class MinIOService:
             # close and release connection
             response.close()
             response.release_conn()
-            return BytesIO(data), headers
+            return BytesIO(data), dict(headers)
 
-        except S3Error as e:
+        except S3Error:
             raise
 
     @classmethod

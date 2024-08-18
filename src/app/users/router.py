@@ -44,9 +44,9 @@ async def create_new_user(
     """
     try:
         return await UserService.create_user(db, user)
-    except UserAlreadyExistsException as e:
+    except UserAlreadyExistsException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -79,9 +79,9 @@ async def get_user_by_id(
         raise NotEnoughPermissionException
     try:
         return await UserService.get_user_by_id(db, user_id)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -148,7 +148,7 @@ async def get_all_users(
     try:
         return await UserService.get_all_users(db, skip, limit)
 
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -183,9 +183,9 @@ async def update_user_by_id(
         raise NotEnoughPermissionException
     try:
         return await UserService.update_user(db, user_id, user_put)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -220,9 +220,9 @@ async def patch_user_by_id(
         raise NotEnoughPermissionException
     try:
         return await UserService.patch_user(db, user_id, user_update)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -254,9 +254,9 @@ async def delete_user_by_id(
         raise NotEnoughPermissionException
     try:
         return await UserService.delete_user(db, user_id)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -287,9 +287,9 @@ async def get_current_profile(
 
     try:
         return await UserService.get_user_by_id(db, current_user.sub)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -322,9 +322,9 @@ async def patch_current_profile(
 
     try:
         return await UserService.patch_user(db, current_user.sub, user_update)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(
@@ -354,9 +354,9 @@ async def delete_current_profile(
 
     try:
         return await UserService.delete_user(db, current_user.sub)
-    except UserNotFoundException as e:
+    except UserNotFoundException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(

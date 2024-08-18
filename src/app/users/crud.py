@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from loguru import logger
@@ -48,7 +49,7 @@ class UserCRUD:
             raise DatabaseException(detail=str(e))
 
     @staticmethod
-    async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User:
+    async def get_user_by_id(db: AsyncSession, user_id: UUID) -> Optional[User]:
         """
         Retrieve a user by user_id from the database.
 
@@ -69,7 +70,7 @@ class UserCRUD:
             raise DatabaseException(detail=str(e))
 
     @staticmethod
-    async def get_user_by_email(db: AsyncSession, email: str) -> User:
+    async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
         """Get a user by email from the database.
 
         Args:
@@ -91,7 +92,7 @@ class UserCRUD:
             raise DatabaseException(detail=str(e))
 
     @staticmethod
-    async def get_user_by_cloudname(db: AsyncSession, cloudname: str) -> User:
+    async def get_user_by_cloudname(db: AsyncSession, cloudname: str) -> Optional[User]:
         """Get a user by cloudname from the database.
 
         Args:
@@ -133,7 +134,7 @@ class UserCRUD:
         try:
             result = await db.execute(select(User).offset(skip).limit(limit))
             users = result.scalars().all()
-            return users
+            return list(users)
         except SQLAlchemyError as e:
             await db.rollback()
             raise DatabaseException(detail=str(e))
@@ -251,7 +252,6 @@ class UserCRUD:
         db_user.password = new_password_hashed
         await db.commit()
         await db.refresh(db_user)
-        return db_user
 
     @staticmethod
     async def validate_user_email(db: AsyncSession, user: User):
@@ -262,10 +262,7 @@ class UserCRUD:
             db (AsyncSession): The database session.
             user (User): The user object.
         """
-        # TODO add active field to user and update it here
-        logger.debug(
-            "user is now activated. TODO: add the activated field to user model"
-        )
+        logger.debug("user is now activated.")
         user.email_activated = True
         await db.commit()
         await db.refresh(user)

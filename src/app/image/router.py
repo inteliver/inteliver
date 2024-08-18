@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.schemas import TokenData
-from app.auth.service import AuthService
 from app.database.dependencies import get_db
 from app.image.service import ImageService
 

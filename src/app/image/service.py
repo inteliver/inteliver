@@ -2,10 +2,6 @@ from io import BytesIO
 
 import cv2
 import numpy as np
-from fastapi import HTTPException
-from fastapi.responses import StreamingResponse
-from loguru import logger
-from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.image.exceptions import (
@@ -14,7 +10,7 @@ from app.image.exceptions import (
     ImageProcessorException,
 )
 from app.image.image_processor import ImageProcessor
-from app.storage.service import MinIOService, StorageService
+from app.storage.service import StorageService
 from app.users.exceptions import UserNotFoundException
 from app.users.service import UserService
 
@@ -57,10 +53,10 @@ class ImageService:
 
         # Check if the cloudname exists and get the user information
         try:
-            user = await UserService.get_user_by_cloudname(db, cloudname)
+            _user = await UserService.get_user_by_cloudname(db, cloudname)
         except UserNotFoundException as e:
             raise CloudnameNotExistsException(
-                detail=f"The requested cloudname {cloudname} does not exists"
+                detail=f"The requested cloudname {cloudname} does not exists. detail: {str(e)}"
             )
 
         # TODO check the commands validity
@@ -72,7 +68,7 @@ class ImageService:
         data, headers = await StorageService.retrieve_image_by_cloudname(
             cloudname, object_key
         )
-        image_format = headers.get("Content-Type")
+        image_format = str(headers.get("Content-Type"))
 
         # Convert image to numpy
         image = ImageService._convert_bytes_to_numpy(data)
@@ -136,33 +132,33 @@ class ImageService:
         """
 
         if not format.startswith("image/"):
-            return "invalid format " + format, None
+            raise ValueError(f"Invalid image format: {format}")
 
         format = format[6:]  # Remove "image/" prefix
 
         if format.startswith("jpeg;q="):
-            q = format[7:]
+            q_str = format[7:]
             try:
-                q = float(q)
-            except:
+                q = float(q_str)
+            except (ValueError, TypeError):
                 q = 0.95
             params = [int(cv2.IMWRITE_JPEG_QUALITY), int(q * 100)]
             result, encoded_image = cv2.imencode(".jpg", image, params)
 
         elif format.startswith("png;q="):
-            q = format[6:]
+            q_str = format[6:]
             try:
-                q = float(q)
-            except:
+                q = float(q_str)
+            except (ValueError, TypeError):
                 q = 0.3
             params = [int(cv2.IMWRITE_PNG_COMPRESSION), int(q * 10)]
             result, encoded_image = cv2.imencode(".png", image, params)
 
         elif format.startswith("webp;q="):
-            q = format[7:]
+            q_str = format[7:]
             try:
-                q = float(q)
-            except:
+                q = float(q_str)
+            except (ValueError, TypeError):
                 q = 0.8
             params = [int(cv2.IMWRITE_WEBP_QUALITY), int(q * 100)]
             result, encoded_image = cv2.imencode(".webp", image, params)

@@ -194,9 +194,9 @@ async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     try:
         return await AuthService.register_user(db, user)
-    except UserAlreadyExistsException as e:
+    except UserAlreadyExistsException:
         raise
-    except DatabaseException as e:
+    except DatabaseException:
         raise
     except Exception as e:
         raise HTTPException(

@@ -8,6 +8,7 @@ class ObjectUploaded(BaseModel):
     uid: UUID
     cloudname: str
     object_key: str
+    detected_content_type: str
 
 
 class ObjectOut(BaseModel):
