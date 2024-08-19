@@ -1,8 +1,8 @@
 site_name: Inteliver
-site_description: inteliver is an opensource image management solution.
+site_description: inteliver, high performance, ready for production, image management.
 site_url: https://docs.inteliver.com
-repo_name: inteliver-docs
-repo_url: https://github.com/inteliver/inteliver-docs
+repo_name: inteliver
+repo_url: https://github.com/inteliver/inteliver
 # edit_uri: edit/main/docs/
 theme:
   name: material
