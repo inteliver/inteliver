@@ -9,7 +9,7 @@ import cv2
 import dlib
 import numpy as np
 
-from app.image.object_detection import ObjectDetection
+#  from app.image.object_detection import ObjectDetection
 
 
 class ImageProcessor:
@@ -29,7 +29,8 @@ class ImageProcessor:
     """
 
     _face_detector = dlib.get_frontal_face_detector()
-    _object_detector = ObjectDetection()
+    # _object_detector = ObjectDetection()
+    _object_detector = None
 
     def __init__(self):
         """
@@ -143,7 +144,7 @@ class ImageProcessor:
         self.image_width = self.image.shape[1]
 
         for cmd in command:
-            if not cmd[:4] in self.command_processors:
+            if cmd[:4] not in self.command_processors:
                 return "error/invalid_subcommand", None
             self.command_processors[cmd[:4]](cmd[4:])
 
@@ -153,7 +154,7 @@ class ImageProcessor:
         ret_val = default_val
         try:
             ret_val = int(str)
-        except:
+        except (ValueError, TypeError):
             pass
         return ret_val
 
@@ -161,7 +162,7 @@ class ImageProcessor:
         ret_val = default_val
         try:
             ret_val = float(str)
-        except:
+        except (ValueError, TypeError):
             pass
         return ret_val
 
@@ -169,11 +170,11 @@ class ImageProcessor:
         if "." in arg_str:
             try:
                 return multiplier * float(arg_str)
-            except:
+            except (ValueError, TypeError):
                 return default
         try:
             return int(arg_str)
-        except:
+        except (ValueError, TypeError):
             return default
 
     def selector_height(self, height):
@@ -354,7 +355,7 @@ class ImageProcessor:
     def selector_mask(self, mask):
         mask_segs = mask.split("_")
         mask_type = mask_segs[0]
-        if not mask_type in self.mask_processors:
+        if mask_type not in self.mask_processors:
             return
         mask_args = "_".join(mask_segs[1:])
         self.mask_processors[mask_type](mask_args)
@@ -393,7 +394,7 @@ class ImageProcessor:
 
         op_segs = operator.split("_")
         op_type = op_segs[0]
-        if not op_type in self.operator_processors:
+        if op_type not in self.operator_processors:
             return
 
         self.operator_processors[op_type](op_segs[1:])
