@@ -2,6 +2,13 @@
 
 
 
+## v0.3.1 (2024-08-19)
+
+### Build
+
+* build: revise dockerfile ([`ed5d4e0`](https://gitlab.com/inteliver/inteliver/-/commit/ed5d4e07507ff9218043af1c2a2a00d6dbaadf60))
+
+
 ## v0.3.0 (2024-08-19)
 
 ### Build
