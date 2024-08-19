@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/inteliver/inteliver"><img src="./src/app/assets/images/inteliver-logo.svg" alt="inteliver logo"></a>
+  <a href="https://github.com/inteliver/inteliver"><img src="https://raw.githubusercontent.com/inteliver/inteliver/main/src/app/assets/images/inteliver-logo.svg" alt="inteliver logo"></a>
 </p>
 
 <p align="center">
@@ -66,7 +66,7 @@ This introductory video explains what Inteliver is, how it operates, and how it 
 
 <figure markdown="span">
   <a href="https://www.youtube.com/watch?v=8hEdIEvt7_E" target="_blank">
-    <img src="docs/assets/inteliver-introduction-video-snapshot.svg#roundcorner" alt="inteliver Introduction Video">
+    <img src="https://raw.githubusercontent.com/inteliver/inteliver/main/docs/assets/inteliver-introduction-video-snapshot.svg" alt="inteliver Introduction Video">
   </a>
   <figcaption>inteliver Introduction Video</figcaption>
 </figure>
