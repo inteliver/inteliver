@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Publish Docker Image
 
 on:
   push:
@@ -34,8 +34,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/api:${{ env.VERSION }}
-            ghcr.io/${{ github.repository_owner }}/api:latest
+            ghcr.io/${{ github.repository_owner }}:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}:latest
 
       - name: Image digest
         run: |
