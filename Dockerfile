@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Stage 2: Production Stage
-FROM python:3.11-slim As production
+FROM python:3.11-slim AS production
 
 # Installing make libgl
 RUN apt update && apt upgrade -y && apt install -y \
