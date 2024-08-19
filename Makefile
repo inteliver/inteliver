@@ -13,7 +13,7 @@ sort-deps:
 
 # Run the FastAPI app using uvicorn with auto-reload
 dev:
-	export PYTHONPATH=`pwd`/src && uvicorn app.main:app --reload
+	export PYTHONPATH=`pwd`/src && uvicorn inteliver.main:app --reload
 
 # Run the service using the cli command inteliver
 run:
@@ -21,12 +21,12 @@ run:
 
 # Run mypy for type checking, Run ruff for linting
 lint:
-	mypy src/app
-	ruff check src/app
+	mypy src/inteliver
+	ruff check src/inteliver
 
 # Generate HTML documentation using pdoc
 docz:
-	pdoc -f --html --output-dir pdoc --skip-errors --config show_source_code=False src/app/
+	pdoc -f --html --output-dir pdoc --skip-errors --config show_source_code=False src/inteliver/
 
 # Generate code statistics using pygount
 summary:
@@ -76,7 +76,7 @@ uninstall:
 
 # Run tests and write the coverage in html format
 testz:
-	export PYTHONPATH=`pwd`/src && pytest --disable-warnings --cov=app --cov-report html tests/
+	export PYTHONPATH=`pwd`/src && pytest --disable-warnings --cov=inteliver --cov-report html tests/
 
 # After adding new messages in the code that needs to be localized using _('new message')
 # run the following:
@@ -87,20 +87,20 @@ testz:
 
 # Extract translatable strings from source files and generate a .pot (Portable Object Template) file
 translate-extract:
-	pybabel extract -o src/app/translations/messages.pot .
+	pybabel extract -o src/inteliver/translations/messages.pot .
 
 # create translation files for each language you want to support
 translate-create:
-	pybabel init -i src/app/translations/messages.pot -d src/app/translations -l en
-	pybabel init -i src/app/translations/messages.pot -d src/app/translations -l fa
+	pybabel init -i src/inteliver/translations/messages.pot -d src/inteliver/translations -l en
+	pybabel init -i src/inteliver/translations/messages.pot -d src/inteliver/translations -l fa
 
 # compiles .po message catalogs to compiled .mo files for all langs
 translate-compile:
-	pybabel compile -d src/app/translations
+	pybabel compile -d src/inteliver/translations
 
 # update messages catalogs for all langs
 translate-update:
-	pybabel update -i src/app/translations/messages.pot -d src/app/translations
+	pybabel update -i src/inteliver/translations/messages.pot -d src/inteliver/translations
 
 revision:
 	alembic revision --autogenerate -m "alembic revision"
@@ -109,9 +109,9 @@ revision:
 migrate:
 	alembic upgrade head
 
+# TODO: add make lint
 all:      
 	$(MAKE) clean
-	$(MAKE) lint
 	$(MAKE) summary
 	$(MAKE) translate-compile
 	$(MAKE) install

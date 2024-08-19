@@ -185,4 +185,4 @@ pyrightconfig.json
 logs
 
 # AI models
-src/app/assets/models
+src/inteliver/assets/models

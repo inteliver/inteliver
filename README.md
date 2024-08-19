@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/inteliver/inteliver"><img src="https://raw.githubusercontent.com/inteliver/inteliver/main/src/app/assets/images/inteliver-logo.svg" alt="inteliver logo"></a>
+  <a href="https://github.com/inteliver/inteliver"><img src="https://raw.githubusercontent.com/inteliver/inteliver/main/src/inteliver/assets/images/inteliver-logo.svg" alt="inteliver logo"></a>
 </p>
 
 <p align="center">

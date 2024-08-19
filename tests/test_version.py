@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
-from app.version import __version__
+from inteliver.main import app
+from inteliver.version import __version__
 
 client = TestClient(app)
 

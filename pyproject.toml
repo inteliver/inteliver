@@ -23,7 +23,7 @@ dynamic = ["version"]
 # This is a one-line description or tagline of what your project does. This
 # corresponds to the "Summary" metadata field:
 # https://packaging.python.org/specifications/core-metadata/#summary
-description = "This is the core inteliver api service."  # Optional
+description = "inteliver, high performance, ready for production, image management."  # Optional
 
 # This is an optional longer description of your project that represents
 # the body of text which users will see when they visit PyPI.
@@ -157,7 +157,7 @@ dev = [
 
 [tool.setuptools.dynamic]
 # change this into __version__ in derived services
-version = {attr = "app.version.__version__"}
+version = {attr = "inteliver.version.__version__"}
 
 # List URLs that are relevant to your project
 #
@@ -178,7 +178,7 @@ version = {attr = "app.version.__version__"}
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
 [project.scripts]  # Optional
-inteliver = "app.cli:cli"
+inteliver = "inteliver.cli:cli"
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.
@@ -212,7 +212,7 @@ logging_use_named_masks = false
 major_on_zero = true
 tag_format = "v{version}"
 # change this into __version__ in derived services
-version_variables = ["src/app/version.py:__version__"]
+version_variables = ["src/inteliver/version.py:__version__"]
 build_command = "make all"
 
 [tool.semantic_release.branches.main]
