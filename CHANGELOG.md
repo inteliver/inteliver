@@ -2,6 +2,15 @@
 
 
 
+## v0.3.2 (2024-08-19)
+
+### Fix
+
+* fix: test changing tags to solve actions error ([`efc2632`](https://gitlab.com/inteliver/inteliver/-/commit/efc26327de28ba036258391819b7c6477dfd3397))
+
+* fix: typo ([`d080587`](https://gitlab.com/inteliver/inteliver/-/commit/d080587dd51924f4c23673018b8cefca3753fb1c))
+
+
 ## v0.3.1 (2024-08-19)
 
 ### Build
