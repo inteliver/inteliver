@@ -2,6 +2,25 @@
 
 
 
+## v0.3.3 (2024-08-19)
+
+### Build
+
+* build: change the trigger to released ([`09bf8ca`](https://gitlab.com/inteliver/inteliver/-/commit/09bf8caa3ad95777e104ded69c59caf5337b9c50))
+
+* build: change trigger condition for test ([`b3e6266`](https://gitlab.com/inteliver/inteliver/-/commit/b3e62665d9d5014985abf96cad699e6e51a26f0b))
+
+* build: add pypi publish workflow ([`945bc83`](https://gitlab.com/inteliver/inteliver/-/commit/945bc83d8b9bd90d897c758a6607bf5c7eec510a))
+
+### Documentation
+
+* docs: update image urls for readme to be absolute urls for pypi readme page ([`b3c8b33`](https://gitlab.com/inteliver/inteliver/-/commit/b3c8b33a040800ae2e35258e7b29855625bcb1ff))
+
+### Fix
+
+* fix: temporarily comment out object detection ([`0421341`](https://gitlab.com/inteliver/inteliver/-/commit/042134118c70c729e540810c5e42d9165b4df9db))
+
+
 ## v0.3.2 (2024-08-19)
 
 ### Fix
