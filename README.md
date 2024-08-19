@@ -16,6 +16,12 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/85b24e0a5466be54852f/maintainability)](https://codeclimate.com/github/inteliver/inteliver/maintainability)
 [![GitHub language](https://img.shields.io/github/languages/top/inteliver/inteliver)](https://github.com/inteliver/inteliver)
 ![GitHub License](https://img.shields.io/github/license/inteliver/inteliver)
+[![PyPI Version](https://img.shields.io/pypi/v/inteliver)](https://pypi.org/project/inteliver/)
+[![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/inteliver/inteliver)](https://github.com/inteliver/inteliver)
+
+<!-- [![Python Version](https://img.shields.io/pypi/pyversions/inteliver)](https://pypi.org/project/inteliver/) -->
+
+
 
 ## inteliver Overview
 
@@ -60,13 +66,17 @@ inteliver is an **image management platform** offering programmable media soluti
 
 ---
 
-## Watch Introduction Video 
+## ▶️ Watch Introduction Video 
 
 This introductory video explains what Inteliver is, how it operates, and how it can enhance your image management processes.
 
 <figure markdown="span">
   <a href="https://www.youtube.com/watch?v=8hEdIEvt7_E" target="_blank">
-    <img src="https://raw.githubusercontent.com/inteliver/inteliver/main/docs/assets/inteliver-introduction-video-snapshot.svg" alt="inteliver Introduction Video">
+    <img 
+      src="https://raw.githubusercontent.com/inteliver/inteliver/main/docs/assets/inteliver-introduction-video-snapshot.svg" alt="inteliver Introduction Video"
+      style="display: block; margin: 0 auto; border-radius: 16px;"
+    />
   </a>
-  <figcaption>inteliver Introduction Video</figcaption>
 </figure>
+
+---
