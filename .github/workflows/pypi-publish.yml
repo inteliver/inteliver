@@ -1,12 +1,11 @@
 name: Publish to PyPI
 
 on:
-  push:
-    branches:
-      - main
-  # release:
-  #   types:
-  #     - created
+  # push:
+  #   branches:
+  #     - main
+  release:
+    types: [released]
 
 jobs:
   publish:
