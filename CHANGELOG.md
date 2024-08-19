@@ -2,6 +2,13 @@
 
 
 
+## v0.4.0 (2024-08-19)
+
+### Refactor
+
+* refactor: change base package name to inteliver ([`e4a8b86`](https://gitlab.com/inteliver/inteliver/-/commit/e4a8b8657a7a7bec5d8853f451918344a1297556))
+
+
 ## v0.3.3 (2024-08-19)
 
 ### Build
