@@ -12,15 +12,17 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 # cmake required for dlib
-RUN apt update && apt install -y --no-install-recommends cmake \
+# Install necessary build tools and libraries
+RUN apt-get update && apt-get install -y \
+    cmake \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Install project dependencies within the virtual environment
-RUN pip install --no-cache-dir -r requirements.txt \
-    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Stage 2: Production Stage
-FROM python:3.11-slim
+FROM python:3.11-slim As production
 
 # Installing make libgl
 RUN apt update && apt upgrade -y && apt install -y \
