@@ -1,5 +1,8 @@
 version: "3.8"
 
+# This docker compose runs postgres and minio service only for development.
+# Use `make dev` command for running intliver in dev mode.
+
 services:
   postgres:
     image: postgres:16
