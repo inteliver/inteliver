@@ -1,0 +1,16 @@
+---
+# These settings are for the development-docker environment
+# In this development environment inteliver is running with 
+# a docker compose, that include postgres and minio on the 
+# same network with traefik as the reverse proxy.
+
+app_api_host: "0.0.0.0"
+app_api_port: 8000
+# CHANGE THIS SECRET KEY IN A PRODUCTION ENV
+# sample secret key 
+# you can generate a 32 byte random key using the following command:
+# openssl rand -base64 32
+jwt_secret_key: "G8GVVh68JeLRoD1doMoN6AL0zROZN1bN35b+zctMm18="
+postgres_host: "postgres"
+minio_host: "minio:9000"
+...

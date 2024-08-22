@@ -192,8 +192,9 @@ include-package-data = true
 # installed, specify them here.
 [tool.setuptools.package-data]
 # Add translation files to be included in the built package
-"app.translations" = ["*.mo", "*.po"]
-
+"inteliver.translations" = ["*.mo", "*.po"]
+# Add default configuration files
+"inteliver.config.yamls" = ["*.yml"]
 
 [build-system]
 # These are the assumed default build requirements from pip:

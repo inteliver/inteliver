@@ -1,0 +1,42 @@
+---
+
+# Sample of inteliver config fields
+# These are the default values in configuration
+# uncomment and change any value
+
+
+# # App setttings
+app_name: "inteliver"
+
+# app_api_host: "127.0.0.1"
+# app_api_port: 8000
+
+# api_prefix: "/api/v1"
+
+# openapi_docs_url: "/docs"
+# openapi_json_url: "/openapi.json"
+
+# app_running_env: "development"
+
+# # postgresql settings
+# postgres_host: "localhost"
+# postgres_user: "postgres"
+# postgres_password: "postgres"
+# postgres_db: "inteliver"
+
+# # minio settings
+# minio_host: "localhost:9000"
+# minio_root_user: "minioadmin"
+# minio_root_password: "minioadmin"
+# minio_secure: False
+
+# # auth settings
+# jwt_secret_key: "your-secret-key"
+# jwt_algorithm: "HS256"
+# # default jwt token expire time is 1 month
+# access_token_expire_minutes: 43200
+# # default jwt token expire time is 1 hour
+# reset_password_token_expire_minutes: 60
+# # default jwt token expire time is 1 hour
+# email_confirmation_token_expires_minutes: 60
+...

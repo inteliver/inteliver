@@ -1,20 +1,18 @@
 import os
-from enum import Enum
 from functools import lru_cache
 
 from loguru import logger
-from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic import Field, ValidationError
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    YamlConfigSettingsSource,
+)
 from tabulate import tabulate
 
-
-class AppEnvEnum(str, Enum):
-    """Enum representing different application environments."""
-
-    DEVELOPMENT = "development"
-    DEVELOPMENT_DOCKER = "development_docker"
-    STAGING = "staging"
-    PRODUCTION = "production"
+from inteliver.config.schema import AppEnvEnum
+from inteliver.config.utils import get_yaml_config_path
 
 
 class InteliverSettings(BaseSettings):
@@ -23,49 +21,82 @@ class InteliverSettings(BaseSettings):
     """
 
     # App setttings
-    app_name: str = Field("inteliver-api", alias="APP_NAME")
+    app_name: str = Field(default="inteliver")
 
-    app_api_host: str = Field("127.0.0.1", alias="APP_API_HOST")
-    app_api_port: int = Field(8000, alias="APP_API_PORT")
+    app_api_host: str = Field(default="127.0.0.1")
+    app_api_port: int = Field(default=8000)
 
-    api_prefix: str = Field("/api/v1", alias="API_PREFIX")
+    api_prefix: str = Field(default="/api/v1")
 
-    openapi_docs_url: str = Field("/docs", alias="FASTAPI_DOCS_URL")
-    openapi_json_url: str = Field("/openapi.json", alias="FASTAPI_OPENAPI_URL")
+    openapi_docs_url: str = Field(default="/docs")
+    openapi_json_url: str = Field(default="/openapi.json")
 
-    app_running_env: AppEnvEnum = Field(AppEnvEnum.DEVELOPMENT, alias="APP_RUNNING_ENV")
+    app_running_env: AppEnvEnum = Field(default=AppEnvEnum.DEVELOPMENT)
 
     # postgresql settings
-    postgres_host: str = Field("localhost", alias="POSTGRES_HOST")
-    postgres_user: str = Field("postgres", alias="POSTGRES_USER")
-    postgres_password: str = Field("postgres", alias="POSTGRES_PASSWORD")
-    postgres_db: str = Field("inteliver", alias="POSTGRES_DB")
+    postgres_host: str = Field(default="localhost")
+    postgres_user: str = Field(default="postgres")
+    postgres_password: str = Field(default="postgres")
+    postgres_db: str = Field(default="inteliver")
 
     # minio settings
-    minio_host: str = Field("localhost:9000", alias="MINIO_HOST")
-    minio_root_user: str = Field("minioadmin", alias="MINIO_ROOT_USER")
-    minio_root_password: str = Field("minioadmin", alias="MINIO_ROOT_PASSWORD")
-    minio_secure: bool = Field(False, alias="MINIO_SECURE")
+    minio_host: str = Field(default="localhost:9000")
+    minio_root_user: str = Field(default="minioadmin")
+    minio_root_password: str = Field(default="minioadmin")
+    minio_secure: bool = Field(default=False)
 
     # auth settings
-    jwt_secret_key: str = Field("your-secret-key", alias="JWT_SECRET_KEY")
-    jwt_algorithm: str = Field("HS256", alias="JWT_ALGORITHM")
-    # 1 month
-    access_token_expire_minutes: int = Field(
-        30 * 24 * 60, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
+    jwt_secret_key: str = Field(default="your-secret-key")
+    jwt_algorithm: str = Field(default="HS256")
+    # default jwt token expire time is 1 month
+    access_token_expire_minutes: int = Field(default=(30 * 24 * 60))
+    # default jwt token expire time is 1 hour
+    reset_password_token_expire_minutes: int = Field(60)
+    # default jwt token expire time is 1 hour
+    email_confirmation_token_expires_minutes: int = Field(60)
+
+    model_config = SettingsConfigDict(
+        env_prefix="inteliver_",
+        yaml_file=get_yaml_config_path(),
+        extra="allow",
     )
-    # 1 hour
-    reset_password_token_expire_minutes: int = Field(
-        60, alias="RESET_PASSWORD_TOKEN_EXPIRE_MINUTES"
-    )
-    # 1 hour
-    email_confirmation_token_expires_minutes: int = Field(
-        60, alias="EMAIL_VALIDATION_TOKEN_EXPIRE_MINUTES"
-    )
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        try:
+            yml_settings = YamlConfigSettingsSource(
+                settings_cls,
+            )
+            logger.debug(yml_settings)
+            return (
+                init_settings,
+                env_settings,
+                yml_settings,
+                file_secret_settings,
+            )
+        except ValidationError as e:
+            logger.error(f"Yaml config file validation failed: {str(e)}")
+        except TypeError:
+            logger.debug(f"Skipping Yaml config file. The file is empty.")
+        except Exception as e:
+            logger.error(f"Unable to apply yaml configuration file: {str(e)}")
+
+        return (
+            init_settings,
+            env_settings,
+            file_secret_settings,
+        )
 
     def log_settings(self):
         """Logs the settings in a tabular format to the console."""
-        headers = ["Field", "Value", "Default Value", "Env Variable"]
+        headers = ["Field", "Value", "Default Value"]
         table = []
 
         for field_name, field_info in self.model_fields.items():
@@ -74,62 +105,20 @@ class InteliverSettings(BaseSettings):
                 field_info.default if field_info.default is not None else "None"
             )
 
-            env_variable = field_info.alias or "N/A"
-
-            table.append([field_name, value, default_value, env_variable])
+            table.append([field_name, value, default_value])
 
         logger.info("\n" + tabulate(table, headers, tablefmt="pretty"))
 
 
-class DevelopmentSettings(InteliverSettings):
-    pass
-
-
-class DevelopmentDockerSettings(InteliverSettings):
-    # example of a database url that has different env variable names and
-    # default value in different running env settings
-    # database_url: str = Field(..., env="STAGING_DB_URL")
-    app_api_host: str = Field("0.0.0.0", alias="CONFIG_APP_API_HOST")
-    app_api_port: int = Field(8000, alias="APP_API_PORT")
-    # sample secret key
-    # you can generate a 32 byte random key using the following command:
-    # openssl rand -base64 32
-    jwt_secret_key: str = Field(
-        "G8GVVh68JeLRoD1doMoN6AL0zROZN1bN35b+zctMm18=", alias="JWT_SECRET_KEY"
-    )
-    postgres_host: str = Field("postgres", alias="POSTGRES_HOST")
-    minio_host: str = Field("minio:9000", alias="MINIO_HOST")
-
-
-class StagingSettings(InteliverSettings):
-    # example of a database url that has different env variable names and
-    # default value in different running env settings
-    # database_url: str = Field(..., env="STAGING_DB_URL")
-    app_api_host: str = Field("0.0.0.0", alias="CONFIG_APP_API_HOST")
-
-
-class ProductionSettings(InteliverSettings):
-    # example of a database url that has different env variable names and
-    # default value in different running env settings
-    # database_url: str = Field(..., env="PROD_DB_URL")
-    app_api_host: str = Field("0.0.0.0", alias="CONFIG_APP_API_HOST")
-
-
 @lru_cache
 def get_settings() -> InteliverSettings:
-    setting_mapping = {
-        AppEnvEnum.DEVELOPMENT: DevelopmentSettings,
-        AppEnvEnum.DEVELOPMENT_DOCKER: DevelopmentDockerSettings,
-        AppEnvEnum.STAGING: StagingSettings,
-        AppEnvEnum.PRODUCTION: ProductionSettings,
-    }
-    running_env = AppEnvEnum(os.getenv("APP_RUNNING_ENV", "development"))
-    logger.debug(f"Running inteliver using {running_env} configs.")
-    setting = setting_mapping.get(running_env, None)
-    if not setting:
-        raise ValueError("Invalid environment specified")
-    return setting()
+    settings = InteliverSettings()
+    if settings.app_running_env in (
+        AppEnvEnum.DEVELOPMENT,
+        AppEnvEnum.DEVELOPMENT_DOCKER,
+    ):
+        settings.log_settings()
+    return settings
 
 
 settings = get_settings()
-settings.log_settings()
