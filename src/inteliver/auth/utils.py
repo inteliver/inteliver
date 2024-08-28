@@ -1,12 +1,10 @@
 from uuid import UUID
 
-from passlib.context import CryptContext
+import bcrypt
 from pydantic import EmailStr
 
 from inteliver.auth.schemas import TokenData
 from inteliver.users.schemas import UserRole
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -20,7 +18,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if passwords match, otherwise False.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    password_byte_enc = plain_password.encode("utf-8")
+    hashed_password_byte_enc = hashed_password.encode("utf-8")
+    return bcrypt.checkpw(
+        password=password_byte_enc, hashed_password=hashed_password_byte_enc
+    )
 
 
 def get_password_hash(password: str) -> str:
@@ -33,7 +35,8 @@ def get_password_hash(password: str) -> str:
     Returns:
         str: The hashed password.
     """
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode("utf-8")
+    return bcrypt.hashpw(password=pwd_bytes, salt=bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_user_id_claim(user_id: UUID, token: TokenData) -> bool:

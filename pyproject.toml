@@ -116,7 +116,7 @@ dependencies = [
     "minio==7.2.7",
     "numpy==1.26.4",
     "opencv-python==4.10.0.84",
-    "passlib[bcrypt]==1.7.4",
+    "bcrypt==4.1.3",
     "pillow==10.4.0",
     "psycopg2-binary==2.9.9",
     "pydantic-settings==2.2.1",
@@ -178,7 +178,7 @@ version = {attr = "inteliver.version.__version__"}
 # The following would provide a command line executable called `sample`
 # which executes the function `main` from this package when invoked.
 [project.scripts]  # Optional
-inteliver = "inteliver.cli:cli"
+inteliver = "inteliver.cli.main:cli"
 
 # This is configuration specific to the `setuptools` build backend.
 # If you are using a different build backend, you will need to change this.
@@ -195,6 +195,10 @@ include-package-data = true
 "inteliver.translations" = ["*.mo", "*.po"]
 # Add default configuration files
 "inteliver.config.yamls" = ["*.yml"]
+# Add alembic.ini config file
+"inteliver" = ["*.ini"]
+# Add all files from the alembic directory
+"inteliver.alembic" = ["**/*"]
 
 [build-system]
 # These are the assumed default build requirements from pip:
