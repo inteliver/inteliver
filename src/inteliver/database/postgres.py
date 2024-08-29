@@ -5,7 +5,8 @@ from inteliver.config import settings
 
 DATABASE_URL = f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_password}@{settings.postgres_host}/{settings.postgres_db}"
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+# TODO: depending on the setting.app_running_env set the logging level (echo) of engine.
+engine = create_async_engine(DATABASE_URL, echo=False)
 
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession

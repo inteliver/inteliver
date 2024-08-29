@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from loguru import logger
 
 from inteliver.database.postgres import init_db
-from inteliver.utils.logger import logger
 
 
 @asynccontextmanager
@@ -20,7 +20,7 @@ async def on_startup(app: FastAPI):
     Args:
         app (FastAPI): The FastAPI application instance.
     """
-    logger.debug("Starting up the app...")
+    logger.info("Starting up the app...")
     # Register to services that needs to be created on startup
     try:
         await init_db()
@@ -36,5 +36,5 @@ async def on_shutdown(app: FastAPI) -> None:
     Args:
         app (FastAPI): The FastAPI application instance.
     """
-    logger.debug("Shutting down gracefully...")
+    logger.info("Shutting down gracefully...")
     # Unregister any service that needs to be gracefully shut down

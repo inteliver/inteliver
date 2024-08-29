@@ -1,5 +1,7 @@
+import logging
 import os
 from functools import lru_cache
+from pathlib import Path
 
 from loguru import logger
 from pydantic import Field, ValidationError
@@ -13,6 +15,7 @@ from tabulate import tabulate
 
 from inteliver.config.schema import AppEnvEnum
 from inteliver.config.utils import get_yaml_config_path
+from inteliver.utils.logger import setup_logging
 
 
 class InteliverSettings(BaseSettings):
@@ -31,10 +34,13 @@ class InteliverSettings(BaseSettings):
     openapi_docs_url: str = Field(default="/docs")
     openapi_json_url: str = Field(default="/openapi.json")
 
-    app_running_env: AppEnvEnum = Field(default=AppEnvEnum.DEVELOPMENT)
+    app_running_env: AppEnvEnum = Field(
+        default=AppEnvEnum.DEVELOPMENT, alias="APP_RUNNING_ENV"
+    )
 
     # postgresql settings
     postgres_host: str = Field(default="localhost")
+    postgres_port: int = Field(default=5432)
     postgres_user: str = Field(default="postgres")
     postgres_password: str = Field(default="postgres")
     postgres_db: str = Field(default="inteliver")
@@ -74,7 +80,6 @@ class InteliverSettings(BaseSettings):
             yml_settings = YamlConfigSettingsSource(
                 settings_cls,
             )
-            logger.debug(yml_settings)
             return (
                 init_settings,
                 env_settings,
@@ -84,7 +89,7 @@ class InteliverSettings(BaseSettings):
         except ValidationError as e:
             logger.error(f"Yaml config file validation failed: {str(e)}")
         except TypeError:
-            logger.debug(f"Skipping Yaml config file. The file is empty.")
+            logger.info(f"Skipping Yaml config file. The file is empty.")
         except Exception as e:
             logger.error(f"Unable to apply yaml configuration file: {str(e)}")
 
@@ -112,13 +117,9 @@ class InteliverSettings(BaseSettings):
 
 @lru_cache
 def get_settings() -> InteliverSettings:
-    settings = InteliverSettings()
-    if settings.app_running_env in (
-        AppEnvEnum.DEVELOPMENT,
-        AppEnvEnum.DEVELOPMENT_DOCKER,
-    ):
-        settings.log_settings()
-    return settings
-
-
-settings = get_settings()
+    setup_logging()
+    try:
+        settings = InteliverSettings()
+        return settings
+    except ValidationError as e:
+        logger.critical(f"Unable to validate pydantic settings: {str(e)}")

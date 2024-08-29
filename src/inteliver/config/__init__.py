@@ -1,3 +1,5 @@
-from .config import settings as settings
+from inteliver.config.config import InteliverSettings, get_settings
 
-__all__ = [settings]
+settings = get_settings()
+
+__all__ = [settings, get_settings]
