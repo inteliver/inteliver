@@ -29,7 +29,7 @@
 
 inteliver is an **image management platform** offering programmable media solutions.
 
-### 🚀 Key Features
+### ✨ Key Features
 
 ### 🖼️ Image Management Features
 - 📝 **On-the-Fly Image Modification**: Resize, crop, sharpen, blur, pixelate, and more in real time with caching.
@@ -80,3 +80,57 @@ This introductory video explains what Inteliver is, how it operates, and how it 
 </figure>
 
 ---
+
+## 🚀 Getting Started
+
+Here is a fast getting started flow, our recommendation is using [docker compose](#using-docker-compose-recommended).
+
+### Using PyPI in Standalone Mode
+
+1. Install inteliver
+
+```bash
+pip install inteliver
+```
+
+2. **Setup configs**
+```bash
+inteliver init
+```
+
+> inteliver depends on **PostgreSQL** and **MinIO** databases, in this setup we assume that you have the databases up and running.
+
+3. Run **inteliver** service
+
+```bash
+inteliver run
+```
+
+## Using Docker Compose (Recommended)
+
+1. Download the [docker compose file](https://github.com/inteliver/inteliver/blob/main/docker-compose.stage.yml)
+
+```bash
+wget -c -o docker-compose.yml https://raw.githubusercontent.com/inteliver/inteliver/main/docker-compose.stage.yml
+```
+
+2. Run docker compose
+
+```bash
+docker compose up
+```
+
+and voilà 🤌! your service is ready, you can see the API docs at http://api.inteliver.local/docs.
+
+> you can set the base domain name of the inteliver in traefik labels in intleiver service in docker compose.
+
+```yml
+  labels:
+    - "traefik.http.routers.inteliver.rule=Host(`api.inteliver.local`)"
+```
+
+> in order to resolve `api.inteliver.local`, add the following line to `/etc/hosts` of your system.
+
+```bash
+127.0.0.1	api.inteliver.local
+```
