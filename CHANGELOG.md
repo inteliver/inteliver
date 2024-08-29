@@ -2,6 +2,33 @@
 
 
 
+## v0.5.0 (2024-08-29)
+
+### Build
+
+* build: update docker compose levels ([`df02f17`](https://gitlab.com/inteliver/inteliver/-/commit/df02f1788d289d734b16a34f73313e3527cdb139))
+
+### Documentation
+
+* docs: update readme, add badges and center the video ([`46203aa`](https://gitlab.com/inteliver/inteliver/-/commit/46203aaafc41b12e0e5fb0aa2a387ef6322092b4))
+
+### Feature
+
+* feat: add inteliver init command ([`90f908c`](https://gitlab.com/inteliver/inteliver/-/commit/90f908ccf3897b4c2e755d7c0513f478069baacb))
+
+### Fix
+
+* fix: docs repo url ([`54fcbf1`](https://gitlab.com/inteliver/inteliver/-/commit/54fcbf1814e731025d6b47af26e5e9b4e2b4a8b2))
+
+### Refactor
+
+* refactor: setup loguru format and loggers ([`3aad875`](https://gitlab.com/inteliver/inteliver/-/commit/3aad875df8986ab64a8e46b8bbbb780a64ba547a))
+
+* refactor: use bcrypt directly instead of passlib ([`039837f`](https://gitlab.com/inteliver/inteliver/-/commit/039837fd406f621e72b9eb3e97075db00fb5ec4e))
+
+* refactor: revise configuration structure ([`f6004cf`](https://gitlab.com/inteliver/inteliver/-/commit/f6004cf2566b8f60410b9d9b55bd2d15dbcae8f7))
+
+
 ## v0.4.0 (2024-08-19)
 
 ### Refactor
