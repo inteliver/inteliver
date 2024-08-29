@@ -22,7 +22,6 @@ app = FastAPI(
     version=__version__,
     docs_url=settings.openapi_docs_url,
     openapi_url=settings.openapi_json_url,
-    # root_path=os.environ.get("FASTAPI_ROOT_PATH", "/api/v1"),
 )
 
 
