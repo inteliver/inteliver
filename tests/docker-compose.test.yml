@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-inteliver}
+
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+
+    ports:
+      - "127.0.0.1:5432:5432"
+
+volumes:
+  postgres_test_data:
