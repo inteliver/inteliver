@@ -6,5 +6,5 @@ class AppEnvEnum(str, Enum):
 
     DEVELOPMENT = "development"
     DEVELOPMENT_DOCKER = "development_docker"
-    STAGING = "staging"
+    # STAGING = "staging"
     PRODUCTION = "production"

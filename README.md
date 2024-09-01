@@ -108,10 +108,10 @@ inteliver run
 
 ## Using Docker Compose (Recommended)
 
-1. Download the [docker compose file](https://github.com/inteliver/inteliver/blob/main/docker-compose.stage.yml)
+1. Download the [docker compose file](https://github.com/inteliver/inteliver/blob/main/docker-compose.prod.yml)
 
 ```bash
-wget -c -o docker-compose.yml https://raw.githubusercontent.com/inteliver/inteliver/main/docker-compose.stage.yml
+wget -c -o docker-compose.yml https://raw.githubusercontent.com/inteliver/inteliver/main/docker-compose.prod.yml
 ```
 
 2. Run docker compose

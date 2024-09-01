@@ -39,7 +39,7 @@ def get_logging_level():
     log_level_mapping = {
         AppEnvEnum.DEVELOPMENT: logging.DEBUG,
         AppEnvEnum.DEVELOPMENT_DOCKER: logging.DEBUG,
-        AppEnvEnum.STAGING: logging.WARNING,
+        # AppEnvEnum.STAGING: logging.WARNING,
         AppEnvEnum.PRODUCTION: logging.WARNING,
     }
     running_env = get_running_env()

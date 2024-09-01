@@ -15,7 +15,7 @@ def get_yaml_config_path() -> str:
     yaml_config_path_mapping = {
         AppEnvEnum.DEVELOPMENT: base_path / "yamls/config.dev.standalone.yml",
         AppEnvEnum.DEVELOPMENT_DOCKER: base_path / "yamls/config.dev.docker.yml",
-        AppEnvEnum.STAGING: home_path / ".config/inteliver/config.yml",
+        # AppEnvEnum.STAGING: home_path / ".config/inteliver/config.yml",
         AppEnvEnum.PRODUCTION: home_path / ".config/inteliver/config.yml",
     }
     running_env = get_running_env()
