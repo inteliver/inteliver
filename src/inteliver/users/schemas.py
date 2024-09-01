@@ -17,7 +17,7 @@ class UserCreate(BaseModel):
     password: str
 
 
-class UserUpdate(BaseModel):
+class UserPatch(BaseModel):
     name: str | None = None
 
 

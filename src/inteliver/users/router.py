@@ -14,7 +14,7 @@ from inteliver.users.exceptions import (
     UserAlreadyExistsException,
     UserNotFoundException,
 )
-from inteliver.users.schemas import UserCreate, UserOut, UserPut, UserRole, UserUpdate
+from inteliver.users.schemas import UserCreate, UserOut, UserPatch, UserPut, UserRole
 from inteliver.users.service import UserService
 
 router = APIRouter()
@@ -196,7 +196,7 @@ async def update_user_by_id(
 @router.patch("/{user_id}", response_model=UserOut, tags=["Users"])
 async def patch_user_by_id(
     user_id: UUID,
-    user_update: UserUpdate,
+    user_update: UserPatch,
     db: AsyncSession = Depends(get_db),
     current_user: TokenData = Depends(AuthService.has_role(UserRole.USER)),
 ):
@@ -205,7 +205,7 @@ async def patch_user_by_id(
 
     Args:
         user_id (UUID): The ID of the user to update.
-        user_update (UserUpdate): The partial updated user information.
+        user_update (UserPatch): The partial updated user information.
         db (AsyncSession): The database session dependency.
 
     Returns:
@@ -299,7 +299,7 @@ async def get_current_profile(
 
 @router.patch("/profile/", response_model=UserOut, tags=["Profile"])
 async def patch_current_profile(
-    user_update: UserUpdate,
+    user_update: UserPatch,
     db: AsyncSession = Depends(get_db),
     current_user: TokenData = Depends(AuthService.has_role(UserRole.USER)),
 ):
@@ -307,7 +307,7 @@ async def patch_current_profile(
     Patch current user profile by ID based on the bearer token sub.
 
     Args:
-        user_update (UserUpdate): The partial updated user information.
+        user_update (UserPatch): The partial updated user information.
         db (AsyncSession): The database session dependency.
 
     Returns:

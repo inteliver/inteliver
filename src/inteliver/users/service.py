@@ -7,7 +7,7 @@ from inteliver.storage.exceptions import CludnameNotSetException
 from inteliver.users.crud import UserCRUD
 from inteliver.users.exceptions import UserNotFoundException
 from inteliver.users.models import User
-from inteliver.users.schemas import UserCreate, UserOut, UserPut, UserUpdate
+from inteliver.users.schemas import UserCreate, UserOut, UserPatch, UserPut
 
 
 class UserService:
@@ -150,7 +150,7 @@ class UserService:
 
     @staticmethod
     async def patch_user(
-        db: AsyncSession, user_id: UUID, user_update: UserUpdate
+        db: AsyncSession, user_id: UUID, user_update: UserPatch
     ) -> UserOut:
         """
         Patch a user via the service layer.
@@ -158,7 +158,7 @@ class UserService:
         Args:
             db (AsyncSession): The database session.
             user_id (UUID): The ID of the user to update.
-            user_update (UserUpdate): The partial updated user information.
+            user_update (UserPatch): The partial updated user information.
 
         Returns:
             UserOut: The updated user schema.
@@ -190,6 +190,19 @@ class UserService:
 
     @staticmethod
     async def get_cloudname(db: AsyncSession, user_id: UUID) -> str:
+        """Get the cloudname of a user by their user ID.
+
+        Args:
+            db (AsyncSession): The database session.
+            user_id (UUID): The unique identifier of the user to retrieve.
+
+        Returns:
+            str: The cloudname of the user.
+
+        Raises:
+            UserNotFoundException: If the user does not exist.
+            CludnameNotSetException: If a database error occurs.
+        """
         cloudname = await UserCRUD.get_cloudname(db, user_id)
         if not cloudname:
             raise CludnameNotSetException

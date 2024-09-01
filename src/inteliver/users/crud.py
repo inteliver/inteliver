@@ -12,7 +12,7 @@ from inteliver.users.exceptions import (
     UserNotFoundException,
 )
 from inteliver.users.models import User
-from inteliver.users.schemas import UserPut, UserUpdate
+from inteliver.users.schemas import UserPatch, UserPut
 
 
 class UserCRUD:
@@ -175,7 +175,7 @@ class UserCRUD:
 
     @staticmethod
     async def patch_user(
-        db: AsyncSession, user_id: UUID, user_update: UserUpdate
+        db: AsyncSession, user_id: UUID, user_update: UserPatch
     ) -> User:
         """
         Patch a user in the database with new information.
@@ -183,7 +183,7 @@ class UserCRUD:
         Args:
             db (AsyncSession): The database session.
             user_id (UUID): The ID of the user to update.
-            user_update (UserUpdate): The partial updated user information.
+            user_update (UserPatch): The partial updated user information.
 
         Returns:
             User: The updated user database model.
