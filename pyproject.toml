@@ -44,7 +44,7 @@ requires-python = ">=3.10"
 # This is either text indicating the license for the distribution, or a file
 # that contains the license
 # https://packaging.python.org/en/latest/specifications/core-metadata/#license
-license = {file = "LICENSE.txt"}
+# license = "MIT License"
 
 # This field adds keywords for your project which will appear on the
 # project page. What does your project relate to?
@@ -77,10 +77,16 @@ classifiers = [  # Optional
   #   4 - Beta
   #   5 - Production/Stable
   "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
 
   # Indicate who your project is intended for
   "Intended Audience :: Developers",
-  "Topic :: Software Development :: Build Tools",
+  "Framework :: FastAPI",
+  # "Topic :: Software Development :: Build Tools",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Topic :: Scientific/Engineering :: Image Recognition",
 
   # Pick your license as you wish
   "License :: OSI Approved :: MIT License",
@@ -206,6 +212,8 @@ include-package-data = true
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[pytest]
+asyncio_mode = "auto"
 
 # semantic-release configs
 
