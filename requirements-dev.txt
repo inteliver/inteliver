@@ -6,7 +6,7 @@ mypy==1.7.0
 pdoc3==0.10.0
 pygount==1.6.1
 pytest-cov==4.1.0
-pytest==7.4.3
+pytest==8.3.2
 pytest-asyncio==0.24.0
 pytest-mock==3.14.0
 python-semantic-release==8.7.0
