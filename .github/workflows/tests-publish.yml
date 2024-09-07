@@ -64,7 +64,7 @@ jobs:
         pytest --disable-warnings --cov=inteliver --cov-report=xml --cov-report=html tests/
 
     - name: Upload coverage to Code Climate
-      uses: paambaati/codeclimate-action@v2.2.4
+      uses: paambaati/codeclimate-action@v9.0.0
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
 
