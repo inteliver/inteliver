@@ -60,6 +60,8 @@ jobs:
         alembic upgrade head
 
     - name: Run tests with coverage
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src  # Set PYTHONPATH to the src directory
       run: |
         pytest --disable-warnings --cov=inteliver --cov-report=xml --cov-report=html tests/
 
