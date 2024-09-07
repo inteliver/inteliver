@@ -59,6 +59,10 @@ jobs:
       run: |
         alembic upgrade head
 
+    - name: Build i18n translation .mo files
+      run: |
+        pybabel compile -d src/inteliver/translations
+
     - name: Run tests with coverage
       env:
         PYTHONPATH: ${{ github.workspace }}/src  # Set PYTHONPATH to the src directory
