@@ -163,7 +163,8 @@ class UserCRUD:
                 raise UserNotFoundException(f"User with id ({user_id}) not found")
 
             for field, value in user_put.model_dump(exclude_unset=True).items():
-                setattr(db_user, field, value)
+                if value:
+                    setattr(db_user, field, value)
 
             await db.commit()
             await db.refresh(db_user)
@@ -197,9 +198,9 @@ class UserCRUD:
 
             if db_user is None:
                 raise UserNotFoundException(f"User with id ({user_id}) not found")
-
             for field, value in user_update.model_dump(exclude_unset=True).items():
-                setattr(db_user, field, value)
+                if value:
+                    setattr(db_user, field, value)
 
             await db.commit()
             await db.refresh(db_user)
