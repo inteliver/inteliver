@@ -3,12 +3,17 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from httpx import AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+from inteliver.auth.schemas import Token
+from inteliver.auth.service import AuthService
 from inteliver.auth.utils import get_password_hash
 from inteliver.config import settings
+from inteliver.database.dependencies import get_db
+from inteliver.main import app
 from inteliver.users.models import User
 from inteliver.users.schemas import UserCreate
 
@@ -128,7 +133,26 @@ async def create_test_users(db_session: AsyncSession):
     await db_session.commit()
 
 
-# @pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
+async def test_app(db_session):
+    async def override_get_db():
+        try:
+            yield db_session
+        finally:
+            await db_session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield app
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def test_client(test_app):
+    async with AsyncClient(app=test_app, base_url="http://test") as client:
+        yield client
+
+
+# @pytest_asyncio.fixture(scope="function")
 # async def client(db_session):
 #     from inteliver.database.dependencies import get_db
 #     from inteliver.main import app
@@ -145,3 +169,16 @@ async def create_test_users(db_session: AsyncSession):
 
 #     with TestClient(app) as test_client:
 #         yield test_client
+
+
+@pytest_asyncio.fixture(scope="function")
+async def auth_token(pre_existing_user: User):
+    """Fixture to generate a JWT token for the pre-existing user."""
+    access_token = AuthService.create_access_token(
+        data={
+            "sub": str(pre_existing_user.uid),
+            "username": pre_existing_user.email_username,
+            "role": pre_existing_user.role,
+        }
+    )
+    return Token(access_token=access_token, token_type="bearer")
