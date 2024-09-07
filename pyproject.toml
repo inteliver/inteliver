@@ -212,9 +212,6 @@ include-package-data = true
 requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[pytest]
-asyncio_mode = "auto"
-
 # semantic-release configs
 
 [tool.semantic_release]
