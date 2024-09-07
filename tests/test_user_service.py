@@ -5,6 +5,7 @@ import pytest
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from inteliver.storage.exceptions import CludnameNotSetException
 from inteliver.users.exceptions import (
     DatabaseException,
     UserAlreadyExistsException,
@@ -272,3 +273,25 @@ async def test_delete_user_not_found(db_session: AsyncSession):
     # Act & Assert
     with pytest.raises(UserNotFoundException):
         await UserService.delete_user(db_session, non_existent_id)
+
+
+@pytest.mark.asyncio
+async def test_get_cloudname_success(db_session, pre_existing_user):
+    """Test retrieving cloudname by user_id."""
+    user_id = pre_existing_user.uid
+
+    # Call the service to retrieve the user by cloudname
+    cloudname = await UserService.get_cloudname(db=db_session, user_id=user_id)
+
+    # Assertions to check if the user was retrieved correctly
+    assert cloudname == pre_existing_user.cloudname
+
+
+@pytest.mark.asyncio
+async def test_get_cloudname_non_existent_user(db_session):
+    """Test retrieving cloudname by user_id."""
+    non_existent_id = UUID("00000000-0000-0000-0000-000000000000")
+
+    # Act & Assert
+    with pytest.raises(CludnameNotSetException):
+        await UserService.get_cloudname(db=db_session, user_id=non_existent_id)
