@@ -113,10 +113,10 @@ async def get_user_by_email(
         raise NotEnoughPermissionException
     try:
         return await UserService.get_user_by_email(db, email)
-    except UserNotFoundException as e:
-        raise e
-    except DatabaseException as e:
-        raise e
+    except UserNotFoundException:
+        raise
+    except DatabaseException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
