@@ -108,7 +108,8 @@ async def logout(token: str = Depends(AuthService.oauth2_scheme)):
     # Implement token invalidation logic
     # For example, add the token to a blacklist or invalidate
     # the session in the database
-    return {"msg": "Successfully logged out"}
+    token_data = AuthService.decode_access_token(token)
+    return {"msg": f"Successfully logged out {token_data.username}"}
 
 
 @router.post("/change-password", tags=["Password"])

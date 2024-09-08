@@ -103,6 +103,19 @@ async def pre_existing_admin(db_session):
 
 
 @pytest_asyncio.fixture(scope="function")
+async def user_create_data(db_session: AsyncSession):
+    yield UserCreate(
+        email_username="newuser@example.com",
+        password="newpassword123",
+        name="New User",
+        cloudname="newuser",
+    )
+    # Cleanup: Delete all users after the test
+    await db_session.execute(User.__table__.delete())
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture(scope="function")
 async def pre_existing_user(db_session):
     """Fixture to create a pre-existing user in the test database and clean up after the test."""
     user_in = UserCreate(
