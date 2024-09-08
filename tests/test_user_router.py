@@ -67,7 +67,23 @@ async def test_get_current_profile_database_exception(
 ):
     mocker.patch(
         "inteliver.users.service.UserService.get_user_by_id",
-        side_effect=Exception("Database error"),
+        side_effect=DatabaseException("Database error"),
+    )
+
+    response = await test_client.get(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_get_current_profile_general_exception(
+    test_client: AsyncClient, auth_token: Token, mocker
+):
+    mocker.patch(
+        "inteliver.users.service.UserService.get_user_by_id",
+        side_effect=Exception("Unexpected error"),
     )
 
     response = await test_client.get(
@@ -200,3 +216,130 @@ async def test_patch_current_profile_email_username_change(
     # currently we do not support changing email address,
     # so the email should be same as the pre_existing user
     assert updated_user["email_username"] == pre_existing_user.email_username
+
+
+@pytest.mark.asyncio
+async def test_patch_current_profile_general_exception(
+    test_client: AsyncClient, auth_token: Token, mocker
+):
+    mocker.patch(
+        "inteliver.users.service.UserService.patch_user",
+        side_effect=Exception("Unexpected error"),
+    )
+    update_data = UserPatch(name="Updated Name")
+    response = await test_client.patch(
+        f"{settings.api_prefix}/users/profile/",
+        json=update_data.model_dump(),
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_success(
+    test_client: AsyncClient,
+    auth_token: Token,
+    pre_existing_user: User,
+    db_session: AsyncSession,
+):
+    response = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_200_OK
+    deleted_user = response.json()
+    assert UserOut(**deleted_user) == UserOut.model_validate(pre_existing_user)
+
+    # Verify that the user is actually deleted from the database
+    db_user = await db_session.get(User, pre_existing_user.uid)
+    assert db_user is None
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_unauthorized(test_client: AsyncClient):
+    response = await test_client.delete(f"{settings.api_prefix}/users/profile/")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_invalid_token(test_client: AsyncClient):
+    response = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": "Bearer invalid_token"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_user_not_found(
+    test_client: AsyncClient,
+    auth_token: Token,
+    db_session: AsyncSession,
+    pre_existing_user: User,
+):
+    # Delete the user from the database to simulate a not found scenario
+    await db_session.delete(pre_existing_user)
+    await db_session.commit()
+
+    response = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_database_exception(
+    test_client: AsyncClient, auth_token: Token, mocker
+):
+    mocker.patch(
+        "inteliver.users.service.UserService.delete_user",
+        side_effect=DatabaseException("Database error"),
+    )
+
+    response = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_idempotency(
+    test_client: AsyncClient, auth_token: Token, pre_existing_user: User
+):
+    # First delete request
+    response1 = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response1.status_code == status.HTTP_200_OK
+
+    # Second delete request with the same token
+    response2 = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response2.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_general_exception(
+    test_client: AsyncClient, auth_token: Token, mocker
+):
+    mocker.patch(
+        "inteliver.users.service.UserService.delete_user",
+        side_effect=Exception("Unexpected error"),
+    )
+
+    response = await test_client.delete(
+        f"{settings.api_prefix}/users/profile/",
+        headers={"Authorization": f"Bearer {auth_token.access_token}"},
+    )
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_delete_current_profile_cascading_delete():
+    # TODO: testing the cascading delete of user
+    pass
