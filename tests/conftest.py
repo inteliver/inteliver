@@ -73,12 +73,71 @@ async def db_session(db_engine):
 
 
 @pytest_asyncio.fixture(scope="function")
+async def pre_existing_admin(db_session):
+    """Fixture to create a pre-existing admin user in the test database and clean up after the test."""
+    admin_in = UserCreate(
+        name="admin_user",
+        email_username="admin@example.com",
+        cloudname="admin_cloudname",
+        password="adminpassword123",
+    )
+
+    hashed_password = get_password_hash(admin_in.password)
+    db_admin = User(
+        name=admin_in.name,
+        email_username=admin_in.email_username,
+        cloudname=admin_in.cloudname,
+        password=hashed_password,
+        role="admin",  # Set the role to admin
+    )
+
+    db_session.add(db_admin)
+    await db_session.commit()
+    await db_session.refresh(db_admin)
+
+    yield db_admin
+
+    # Cleanup: Delete admin and all other users created after the test
+    await db_session.execute(User.__table__.delete())
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture(scope="function")
 async def pre_existing_user(db_session):
     """Fixture to create a pre-existing user in the test database and clean up after the test."""
     user_in = UserCreate(
         name="existing_user",
         email_username="existing_user@example.com",
         cloudname="existing_cloudname",
+        password="password123",
+    )
+
+    hashed_password = get_password_hash(user_in.password)
+    db_user = User(
+        name=user_in.name,
+        email_username=user_in.email_username,
+        cloudname=user_in.cloudname,
+        password=hashed_password,
+    )
+
+    db_session.add(db_user)
+    await db_session.commit()
+    await db_session.refresh(db_user)
+
+    yield db_user
+
+    # Cleanup: Delete the user after the test
+    await db_session.delete(db_user)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def pre_existing_user_second(db_session):
+    """Fixture to create a second pre-existing user in the test database and clean up after the test."""
+    user_in = UserCreate(
+        name="existing_user_second",
+        email_username="existing_user_second@example.com",
+        cloudname="existing_cloudname_second",
         password="password123",
     )
 
@@ -152,25 +211,6 @@ async def test_client(test_app):
         yield client
 
 
-# @pytest_asyncio.fixture(scope="function")
-# async def client(db_session):
-#     from inteliver.database.dependencies import get_db
-#     from inteliver.main import app
-
-#     async def override_get_db():
-#         try:
-#             yield db_session
-#         finally:
-#             await db_session.close()
-
-#     app.dependency_overrides[get_db] = override_get_db
-
-#     from fastapi.testclient import TestClient
-
-#     with TestClient(app) as test_client:
-#         yield test_client
-
-
 @pytest_asyncio.fixture(scope="function")
 async def auth_token(pre_existing_user: User):
     """Fixture to generate a JWT token for the pre-existing user."""
@@ -179,6 +219,19 @@ async def auth_token(pre_existing_user: User):
             "sub": str(pre_existing_user.uid),
             "username": pre_existing_user.email_username,
             "role": pre_existing_user.role,
+        }
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+
+@pytest_asyncio.fixture(scope="function")
+async def auth_token_admin(pre_existing_admin: User):
+    """Fixture to generate a JWT token for the pre-existing user."""
+    access_token = AuthService.create_access_token(
+        data={
+            "sub": str(pre_existing_admin.uid),
+            "username": pre_existing_admin.email_username,
+            "role": pre_existing_admin.role,
         }
     )
     return Token(access_token=access_token, token_type="bearer")
