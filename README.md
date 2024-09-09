@@ -13,7 +13,9 @@
 ---
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/inteliver/inteliver/docker-publish.yml)](https://github.com/inteliver/inteliver/actions/workflows/docker-publish.yml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/inteliver/inteliver/tests-publish.yml?label=tests)
 [![Maintainability](https://api.codeclimate.com/v1/badges/85b24e0a5466be54852f/maintainability)](https://codeclimate.com/github/inteliver/inteliver/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/85b24e0a5466be54852f/test_coverage)](https://codeclimate.com/github/inteliver/inteliver/test_coverage)
 [![GitHub language](https://img.shields.io/github/languages/top/inteliver/inteliver)](https://github.com/inteliver/inteliver)
 ![GitHub License](https://img.shields.io/github/license/inteliver/inteliver)
 [![PyPI Version](https://img.shields.io/pypi/v/inteliver)](https://pypi.org/project/inteliver/)
