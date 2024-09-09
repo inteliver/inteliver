@@ -113,8 +113,8 @@ class MinIOService:
             # List objects in the bucket
             objects_iter = cls.client.list_objects(bucket_name)
             return list(itertools.islice(objects_iter, skip, skip + limit))
-        except S3Error as e:
-            raise S3ErrorException(detail=f"Error listing objects: {e}")
+        except S3Error:
+            raise
 
     @classmethod
     def get_object_stats(cls, bucket_name: str, object_name: str):
@@ -131,11 +131,7 @@ class MinIOService:
         Raises:
             S3Error: If the object stats cannot be retrieved.
         """
-        try:
-            stats = cls.client.stat_object(bucket_name, object_name)
-            return stats
-        except S3Error as e:
-            raise S3ErrorException(detail=f"MinIO S3Error (stat_object): {e}")
+        return cls.client.stat_object(bucket_name, object_name)
 
 
 class StorageService:
@@ -292,8 +288,15 @@ class StorageService:
         # Step 1: Get user's cloudname
         cloudname = await UserService.get_cloudname(db, uid)
 
+        # Step 2: Check if bucket exists, if not create it
+        if not MinIOService.bucket_exists(cloudname):
+            MinIOService.make_bucket(cloudname)
+            return []
         # Step 3: List objects from MinIO
-        objects = MinIOService.list_objects(cloudname, skip, limit)
+        try:
+            objects = MinIOService.list_objects(cloudname, skip, limit)
+        except S3Error as e:
+            raise S3ErrorException(detail=f"Error listing objects: {e}")
 
         return [
             ObjectOut(
@@ -338,11 +341,8 @@ class StorageService:
                 last_modified=stats.last_modified.isoformat(),
                 content_type=stats.content_type,
             )
-        except Exception as e:
-            logger.debug(f"MinIO S3Error: {str(e)}")
-            raise S3ErrorException(
-                detail=f"Could not retrieve stats for object ({object_key})",
-            )
+        except S3Error:
+            raise S3ErrorObjectNotFoundException
 
     @staticmethod
     def _validate_image_format(file: UploadFile) -> str | None:

@@ -1,9 +1,13 @@
 import asyncio
+import os
+from io import BytesIO
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from fastapi import UploadFile
 from httpx import AsyncClient
+from minio import Minio, S3Error
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -14,6 +18,7 @@ from inteliver.auth.utils import get_password_hash
 from inteliver.config import settings
 from inteliver.database.dependencies import get_db
 from inteliver.main import app
+from inteliver.storage.service import StorageService
 from inteliver.users.models import User
 from inteliver.users.schemas import UserCreate
 
@@ -72,13 +77,103 @@ async def db_session(db_engine):
             await session.rollback()
 
 
+@pytest_asyncio.fixture(scope="module")
+async def minio_client():
+    return Minio(
+        settings.minio_host,
+        access_key=settings.minio_root_user,
+        secret_key=settings.minio_root_password,
+        secure=settings.minio_secure,
+    )
+
+
+@pytest_asyncio.fixture(scope="function")
+async def cleanup_minio(minio_client, pre_existing_user):
+    yield
+    # Clean up the bucket after each test
+    try:
+        objects = minio_client.list_objects(pre_existing_user.cloudname, recursive=True)
+        for obj in objects:
+            minio_client.remove_object(pre_existing_user.cloudname, obj.object_name)
+        minio_client.remove_bucket(pre_existing_user.cloudname)
+    except S3Error:
+        pass
+
+
+@pytest_asyncio.fixture(scope="function")
+async def setup_minio_data(minio_client, pre_existing_user):
+    # Path to the sample test image
+    filepath = "tests/assets/images/jpg_test_image.jpeg"
+
+    # Ensure the file exists
+    assert os.path.exists(filepath), f"Test image not found at {filepath}"
+
+    # Read the image file
+    with open(filepath, "rb") as image_file:
+        image_data = image_file.read()
+
+    bucket_name = pre_existing_user.cloudname
+    if not minio_client.bucket_exists(bucket_name):
+        minio_client.make_bucket(bucket_name)
+
+    # Upload the image 10 times with different names
+    for i in range(10):
+        object_name = f"test_image_{i+1}.jpg"
+        minio_client.put_object(
+            bucket_name,
+            object_name,
+            data=BytesIO(image_data),
+            length=len(image_data),
+            content_type="image/jpeg",
+        )
+
+    yield
+
+    # Clean up after test
+    objects = minio_client.list_objects(bucket_name, recursive=True)
+    for obj in objects:
+        minio_client.remove_object(bucket_name, obj.object_name)
+    minio_client.remove_bucket(bucket_name)
+
+
+@pytest_asyncio.fixture(scope="function")
+async def test_image_file():
+    # Prepare test data
+    filepath = "tests/assets/images/jpg_test_image.jpeg"
+    with open(filepath, "rb") as image_file:
+        file = UploadFile(
+            filename="jpg_test_image.jpg", file=BytesIO(image_file.read())
+        )
+    yield file
+
+
+@pytest_asyncio.fixture
+async def uploaded_image(db_session, pre_existing_user: User):
+    filepath = "tests/assets/images/jpg_test_image.jpeg"
+
+    with open(filepath, "rb") as image_file:
+        file_content = image_file.read()
+
+    file = UploadFile(
+        filename="jpg_test_image.jpg",
+        file=BytesIO(file_content),
+        size=len(file_content),
+    )
+    # Upload the image
+    uploaded = await StorageService.upload_image(
+        db_session, pre_existing_user.uid, file
+    )
+
+    yield uploaded
+
+
 @pytest_asyncio.fixture(scope="function")
 async def pre_existing_admin(db_session):
     """Fixture to create a pre-existing admin user in the test database and clean up after the test."""
     admin_in = UserCreate(
         name="admin_user",
         email_username="admin@example.com",
-        cloudname="admin_cloudname",
+        cloudname="admincloudname",
         password="adminpassword123",
     )
 
@@ -121,7 +216,7 @@ async def pre_existing_user(db_session):
     user_in = UserCreate(
         name="existing_user",
         email_username="existing_user@example.com",
-        cloudname="existing_cloudname",
+        cloudname="existingcloudname",
         password="password123",
     )
 
@@ -150,7 +245,7 @@ async def pre_existing_user_second(db_session):
     user_in = UserCreate(
         name="existing_user_second",
         email_username="existing_user_second@example.com",
-        cloudname="existing_cloudname_second",
+        cloudname="existingcloudnamesecond",
         password="password123",
     )
 
