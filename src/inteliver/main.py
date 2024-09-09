@@ -5,6 +5,7 @@
 
 """
 
+import uvicorn
 from fastapi import FastAPI
 
 from inteliver.config import settings
@@ -30,8 +31,6 @@ app.add_middleware(LanguageMiddleware)
 
 
 def run_service(host: str = settings.app_api_host, port: int = settings.app_api_port):
-    import uvicorn
-
     uvicorn.run(app, host=host, port=port)
 
 
