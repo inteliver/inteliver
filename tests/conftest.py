@@ -148,7 +148,11 @@ async def test_image_file():
 
 
 @pytest_asyncio.fixture
-async def uploaded_image(db_session, pre_existing_user: User):
+async def uploaded_image(
+    db_session,
+    pre_existing_user: User,
+    cleanup_minio,
+):
     filepath = "tests/assets/images/jpg_test_image.jpeg"
 
     with open(filepath, "rb") as image_file:

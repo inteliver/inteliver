@@ -23,3 +23,11 @@ class ImageProcessorException(HTTPException):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=detail,
         )
+
+
+class UnprocessableCommandArgumentsException(HTTPException):
+    def __init__(self, detail: str = "Unprocessable Command Arguments"):
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=detail,
+        )

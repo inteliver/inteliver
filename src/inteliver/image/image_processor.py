@@ -166,10 +166,7 @@ class ImageProcessor:
 
     def _arg_value(self, arg_str: str, multiplier: int = 1):
         if "." in arg_str:
-            try:
-                return int(multiplier * float(arg_str))
-            except (ValueError, TypeError):
-                raise UnprocessableCommandArgumentsException
+            return int(self._safe_float(arg_str, multiplier))
         else:
             return self._safe_int(arg_str)
 
