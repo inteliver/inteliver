@@ -254,7 +254,7 @@ test_cases_insufficient_command_arg = [
     # arg pixelate
     ("i_o_pixelate", {}),
     # arg text-overly
-    ("i_c_y_100,i_c_x_-180,i_o_text_Your-Brand", {}),
+    ("i_c_y_-100,i_c_x_-180,i_o_text_Your-Brand", {}),
 ]
 
 
