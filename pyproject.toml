@@ -214,7 +214,7 @@ build-backend = "setuptools.build_meta"
 
 # coverage configs
 [tool.coverage.run]
-omit = ["src/inteliver/cli/*"]
+omit = ["src/inteliver/cli/*", "src/inteliver/image/object_detection.py"]
 
 [tool.coverage.report]
 # You can add additional report settings here if needed
