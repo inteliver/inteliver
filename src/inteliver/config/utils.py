@@ -25,8 +25,8 @@ def get_yaml_config_path() -> str:
     pre_setup_format: str = "<level>{message}</level>"
     logger.remove()
     logger.add(sink=sys.stdout, format=pre_setup_format)
-    logger.warning(f"Running inteliver in {running_env.value} mode.")
-    logger.info(f"Default YAML config file location at: {yaml_config_path}")
+    logger.warning(f"Mode: {running_env.value}")
+    logger.info(f"Config: {yaml_config_path}")
     return yaml_config_path
 
 
