@@ -149,12 +149,33 @@ async def test_image_file():
 
 @pytest_asyncio.fixture
 async def uploaded_image(
-    db_session,
+    db_session: AsyncSession,
     pre_existing_user: User,
     cleanup_minio,
 ):
     filepath = "tests/assets/images/jpg_test_image.jpeg"
 
+    uploaded = await upload_image_util(db_session, pre_existing_user, filepath)
+    yield uploaded
+
+
+@pytest_asyncio.fixture
+async def uploaded_image_face(
+    db_session: AsyncSession,
+    pre_existing_user: User,
+    cleanup_minio,
+):
+    filepath = "tests/assets/images/jpg_test_face_image.jpeg"
+
+    uploaded = await upload_image_util(db_session, pre_existing_user, filepath)
+    yield uploaded
+
+
+async def upload_image_util(
+    db_session: AsyncSession,
+    pre_existing_user: User,
+    filepath: str,
+):
     with open(filepath, "rb") as image_file:
         file_content = image_file.read()
 
@@ -167,8 +188,7 @@ async def uploaded_image(
     uploaded = await StorageService.upload_image(
         db_session, pre_existing_user.uid, file
     )
-
-    yield uploaded
+    return uploaded
 
 
 @pytest_asyncio.fixture(scope="function")

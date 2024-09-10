@@ -9,7 +9,11 @@ import cv2
 import dlib
 import numpy as np
 
-from inteliver.image.exceptions import UnprocessableCommandArgumentsException
+from inteliver.image.exceptions import (
+    InsufficientCommandArgumentsException,
+    InvalidCommandOperationException,
+    UnprocessableCommandArgumentsException,
+)
 
 #  from app.image.object_detection import ObjectDetection
 
@@ -49,14 +53,10 @@ class ImageProcessor:
         """
 
         # select window dictionary
-        # select_window[0] = select_window['width']
-        # select_window[1] = select_windo['height']
         self.select_window = {"height": None, "width": None}
         # For multiple window selectors like face
         self.select_windows = []
         # [x, y]
-        # gravity[0] = gravity['x']
-        # gravity[1] = gravity['y']
         self.gravity = {"x": None, "y": None}
         self.image = None
         self.format = "image/jpeg;q=0.95"
@@ -257,7 +257,7 @@ class ImageProcessor:
         """
 
         if len(center_segs) < 2:
-            return
+            raise InsufficientCommandArgumentsException
         value = center_segs[1]
         self.gravity["x"] = self._arg_value(value, self.image_width)
         if self.gravity["x"] < 0:
@@ -274,7 +274,7 @@ class ImageProcessor:
         """
 
         if len(center_segs) < 2:
-            return
+            raise InsufficientCommandArgumentsException
         value = center_segs[1]
 
         self.gravity["y"] = self._arg_value(value, self.image_height)
@@ -316,7 +316,7 @@ class ImageProcessor:
 
     def selector_center_object(self, center_segs):
         """
-        ImageProcessor selector_center_face method
+        ImageProcessor selector_center_object method
 
         This method will set gravity of an image based on detected object.
 
@@ -386,7 +386,7 @@ class ImageProcessor:
         op_segs = operator.split("_")
         op_type = op_segs[0]
         if op_type not in self.operator_processors:
-            return
+            raise InvalidCommandOperationException
 
         self.operator_processors[op_type](op_segs[1:])
 
@@ -499,7 +499,7 @@ class ImageProcessor:
         new_width = self.select_window["width"]
 
         if new_height is None and new_width is None:
-            return
+            raise InsufficientCommandArgumentsException
 
         if new_height is None:
             new_height = self._safe_int(
@@ -545,7 +545,7 @@ class ImageProcessor:
 
         args_size = len(args)
         if args_size == 0:
-            return
+            raise InsufficientCommandArgumentsException
         format = "image/jpeg"
         quality = 0.95
         if args[0] == "png":
@@ -612,11 +612,9 @@ class ImageProcessor:
         """
 
         if not len(args):
-            return
+            raise InsufficientCommandArgumentsException
 
         rot_degree = self._safe_int(args[0])
-        if not rot_degree:
-            return
 
         rot_scale = 1.0
         if len(args) > 1:
@@ -654,11 +652,11 @@ class ImageProcessor:
         """
 
         if not len(args):
-            return
+            raise InsufficientCommandArgumentsException
         rot_codes = {"v": 0, "h": 1, "b": -1}
         rot_code = args[0]
         if rot_code not in rot_codes:
-            return
+            raise InsufficientCommandArgumentsException
         self.image = cv2.flip(self.image, rot_codes[rot_code])
 
     def operator_round_crop(self, args):
@@ -718,7 +716,7 @@ class ImageProcessor:
         """
 
         if len(args) == 0:
-            return
+            raise InsufficientCommandArgumentsException
         pixel_size = self._safe_int(args[0])
         if pixel_size < 2:
             return
@@ -772,7 +770,7 @@ class ImageProcessor:
         """
 
         if len(args) < 6:
-            return
+            raise InsufficientCommandArgumentsException
         center = [self.gravity["x"], self.gravity["y"]]
         if center[0] is None:
             center[0] = self.image_width // 2

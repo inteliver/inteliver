@@ -26,7 +26,23 @@ class ImageProcessorException(HTTPException):
 
 
 class UnprocessableCommandArgumentsException(HTTPException):
-    def __init__(self, detail: str = "Unprocessable Command Arguments"):
+    def __init__(self, detail: str = "Unprocessable command arguments"):
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=detail,
+        )
+
+
+class InsufficientCommandArgumentsException(HTTPException):
+    def __init__(self, detail: str = "Insufficient number of command arguments"):
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=detail,
+        )
+
+
+class InvalidCommandOperationException(HTTPException):
+    def __init__(self, detail: str = "Invalid command operation"):
         super().__init__(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=detail,
