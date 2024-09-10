@@ -9,6 +9,8 @@ import cv2
 import dlib
 import numpy as np
 
+from inteliver.image.exceptions import UnprocessableCommandArgumentsException
+
 #  from app.image.object_detection import ObjectDetection
 
 
@@ -150,32 +152,26 @@ class ImageProcessor:
 
         return self.format, self.image
 
-    def _safe_int(self, str, default_val=0):
-        ret_val = default_val
-        try:
-            ret_val = int(str)
-        except (ValueError, TypeError):
-            pass
-        return ret_val
-
-    def _safe_float(self, str, default_val=0.0):
-        ret_val = default_val
-        try:
-            ret_val = float(str)
-        except (ValueError, TypeError):
-            pass
-        return ret_val
-
-    def _arg_value(self, arg_str, multiplier, default=None):
-        if "." in arg_str:
-            try:
-                return multiplier * float(arg_str)
-            except (ValueError, TypeError):
-                return default
+    def _safe_int(self, arg_str: str):
         try:
             return int(arg_str)
         except (ValueError, TypeError):
-            return default
+            raise UnprocessableCommandArgumentsException
+
+    def _safe_float(self, arg_str: str, multiplier: int = 1):
+        try:
+            return multiplier * float(arg_str)
+        except (ValueError, TypeError):
+            raise UnprocessableCommandArgumentsException
+
+    def _arg_value(self, arg_str: str, multiplier: int = 1):
+        if "." in arg_str:
+            try:
+                return int(multiplier * float(arg_str))
+            except (ValueError, TypeError):
+                raise UnprocessableCommandArgumentsException
+        else:
+            return self._safe_int(arg_str)
 
     def selector_height(self, height):
         """
@@ -200,9 +196,7 @@ class ImageProcessor:
         elif height == "iw":
             self.select_window["height"] = self.image_width
         else:
-            self.select_window["height"] = self._arg_value(
-                height, self.image_height, None
-            )
+            self.select_window["height"] = self._arg_value(height, self.image_height)
 
     def selector_width(self, width):
         """
@@ -227,7 +221,7 @@ class ImageProcessor:
         elif width == "iw":
             self.select_window["width"] = self.image_width
         else:
-            self.select_window["width"] = self._arg_value(width, self.image_width, None)
+            self.select_window["width"] = self._arg_value(width, self.image_width)
 
     def selector_center(self, center):
         """
@@ -268,7 +262,7 @@ class ImageProcessor:
         if len(center_segs) < 2:
             return
         value = center_segs[1]
-        self.gravity["x"] = self._arg_value(value, self.image_width, None)
+        self.gravity["x"] = self._arg_value(value, self.image_width)
         if self.gravity["x"] < 0:
             self.gravity["x"] += self.image_width
 
@@ -286,7 +280,7 @@ class ImageProcessor:
             return
         value = center_segs[1]
 
-        self.gravity["y"] = self._arg_value(value, self.image_height, None)
+        self.gravity["y"] = self._arg_value(value, self.image_height)
         if self.gravity["y"] < 0:
             self.gravity["y"] += self.image_height
 
@@ -560,21 +554,21 @@ class ImageProcessor:
         if args[0] == "png":
             format = "image/png"
             if args_size > 1:
-                q = self._safe_int(args[1], 3)
+                q = self._safe_int(args[1])
                 quality = max(0, min(9, q)) / 10.0
             else:
                 quality = 0.3
         elif args[0] == "jpg" or args[0] == "jpeg":
             format = "image/jpeg"
             if args_size > 1:
-                q = self._safe_int(args[1], 95)
+                q = self._safe_int(args[1])
                 quality = max(0, min(100, q)) / 100.0
             else:
                 quality = 0.95
         elif args[0] == "webp":
             format = "image/webp"
             if args_size > 1:
-                q = self._safe_int(args[1], 80)
+                q = self._safe_int(args[1])
                 quality = max(0, min(100, q)) / 100.0
             else:
                 quality = 0.80
@@ -597,7 +591,7 @@ class ImageProcessor:
 
         ksize = 3
         if len(args) > 0:
-            ksize = self._safe_int(args[0], 3)
+            ksize = self._safe_int(args[0])
             if ksize % 2 == 0:
                 ksize += 1
 
@@ -623,13 +617,13 @@ class ImageProcessor:
         if not len(args):
             return
 
-        rot_degree = self._safe_int(args[0], 0)
+        rot_degree = self._safe_int(args[0])
         if not rot_degree:
             return
 
         rot_scale = 1.0
         if len(args) > 1:
-            rot_scale = self._safe_float(args[1], 1.0)
+            rot_scale = self._safe_float(args[1])
 
         center = [self.gravity["x"], self.gravity["y"]]
         if center[0] is None:
@@ -728,7 +722,7 @@ class ImageProcessor:
 
         if len(args) == 0:
             return
-        pixel_size = self._safe_int(args[0], 0)
+        pixel_size = self._safe_int(args[0])
         if pixel_size < 2:
             return
 
@@ -788,11 +782,11 @@ class ImageProcessor:
         if center[1] is None:
             center[1] = self.image_height // 2
         text = args[0]
-        scale = self._safe_float(args[1], 1.0)
-        font = self._safe_int(args[2], 0)
-        red = self._safe_int(args[3], 255)
-        green = self._safe_int(args[4], 255)
-        blue = self._safe_int(args[5], 255)
+        scale = self._safe_float(args[1])
+        font = self._safe_int(args[2])
+        red = self._safe_int(args[3])
+        green = self._safe_int(args[4])
+        blue = self._safe_int(args[5])
         size = cv2.getTextSize(text, font, scale, 1)
         center[0] -= size[0][0] // 2
         center[1] -= size[1]
