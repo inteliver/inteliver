@@ -38,10 +38,11 @@ class UserCRUD:
             await db.refresh(db_user)
             return db_user
 
-        except IntegrityError:
+        except IntegrityError as e:
             await db.rollback()
+            # TODO: send separate errors for duplicate cloudname or email
             raise UserAlreadyExistsException(
-                detail=f"User with this email ({db_user.email_username}) already exists."
+                detail=f"Unable to create user. A user with this email or cloudname exists"
             )
 
         except SQLAlchemyError as e:

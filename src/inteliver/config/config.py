@@ -99,7 +99,7 @@ class InteliverSettings(BaseSettings):
             file_secret_settings,
         )
 
-    def log_settings(self):
+    def log_settings(self):  # pragma: no cover
         """Logs the settings in a tabular format to the console."""
         headers = ["Field", "Value", "Default Value"]
         table = []

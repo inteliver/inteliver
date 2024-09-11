@@ -109,12 +109,10 @@ class MinIOService:
         Returns:
             List[Object]: List of objects.
         """
-        try:
-            # List objects in the bucket
-            objects_iter = cls.client.list_objects(bucket_name)
-            return list(itertools.islice(objects_iter, skip, skip + limit))
-        except S3Error:
-            raise
+
+        # List objects in the bucket
+        objects_iter = cls.client.list_objects(bucket_name)
+        return list(itertools.islice(objects_iter, skip, skip + limit))
 
     @classmethod
     def get_object_stats(cls, bucket_name: str, object_name: str):

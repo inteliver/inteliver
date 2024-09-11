@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from loguru import logger
 
-from inteliver.database.postgres import init_db
+# from inteliver.database.postgres import init_db
 
 
 @asynccontextmanager
@@ -22,10 +22,10 @@ async def on_startup(app: FastAPI):
     """
     logger.info("Starting up the app...")
     # Register to services that needs to be created on startup
-    try:
-        await init_db()
-    except Exception as e:
-        logger.error(f"Error on initializing postgres db. detail: {e}")
+    # try:
+    #     await init_db()
+    # except Exception as e:
+    #     logger.error(f"Error on initializing postgres db. detail: {e}")
     return app
 
 
