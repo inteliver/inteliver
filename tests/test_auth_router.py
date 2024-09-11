@@ -25,6 +25,20 @@ async def test_login_success(test_client: AsyncClient, pre_existing_user: User):
 
 
 @pytest.mark.asyncio
+async def test_login_incorrect_password(
+    test_client: AsyncClient, pre_existing_user: User
+):
+    response = await test_client.post(
+        f"{settings.api_prefix}/auth/login",
+        data={
+            "username": pre_existing_user.email_username,
+            "password": "wrongpassword",
+        },
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
 async def test_login_failure(test_client: AsyncClient):
     response = await test_client.post(
         f"{settings.api_prefix}/auth/login",
@@ -139,6 +153,7 @@ async def test_register_user_already_exists(
     response = await test_client.post(
         f"{settings.api_prefix}/auth/register", json=user_create_data.model_dump()
     )
+    # registering for the second time
     response = await test_client.post(
         f"{settings.api_prefix}/auth/register", json=user_create_data.model_dump()
     )
@@ -154,6 +169,22 @@ async def test_register_user_database_error(
     mocker.patch(
         "inteliver.auth.service.AuthService.register_user",
         side_effect=DatabaseException("Database error"),
+    )
+    response = await test_client.post(
+        f"{settings.api_prefix}/auth/register", json=user_create_data.model_dump()
+    )
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+
+@pytest.mark.asyncio
+async def test_register_user_general_exception(
+    test_client: AsyncClient,
+    user_create_data: UserCreate,
+    mocker,
+):
+    mocker.patch(
+        "inteliver.auth.service.AuthService.register_user",
+        side_effect=Exception("Unexpected error"),
     )
     response = await test_client.post(
         f"{settings.api_prefix}/auth/register", json=user_create_data.model_dump()

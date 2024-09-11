@@ -141,17 +141,18 @@ async def test_upload_image_minio_error(
     mocker,
     cleanup_minio,
 ):
+
     # Mock MinIOService to raise an S3Error
     mocker.patch.object(
         MinIOService,
         "put_object",
         side_effect=S3Error(
-            code=500,
-            message="Mocked S3Error",
-            request_id=None,
-            host_id=None,
-            resource=None,
-            response=None,
+            "MockedS3Error",
+            "MockedS3ErrorMessage",
+            "MockedResource",
+            "RequestID",
+            "HostID",
+            500,
         ),
     )
 
@@ -163,6 +164,7 @@ async def test_upload_image_minio_error(
     )
     # Assert response
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert "S3 object storage error occured" in response.json()["detail"]
 
 
 # Test scenarios for storage list of images
@@ -351,6 +353,30 @@ async def test_delete_image_unauthorized(
         f"{settings.api_prefix}/storage/images/{uploaded_image.object_key}",
     )
 
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.asyncio
+async def test_delete_image_general_exception(
+    test_client: AsyncClient,
+    uploaded_image: ObjectUploaded,
+    mocker,
+    cleanup_minio,
+):
+    response = await test_client.delete(
+        f"{settings.api_prefix}/storage/images/{uploaded_image.object_key}",
+    )
+    mocker.patch(
+        "inteliver.storage.service.MinIOService.delete_object",
+        side_effect=S3Error(
+            "MockedS3Error",
+            "MockedS3ErrorMessage",
+            "MockedResource",
+            "RequestID",
+            "HostID",
+            500,
+        ),
+    )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
