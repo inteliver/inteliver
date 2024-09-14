@@ -111,6 +111,10 @@ nav:
     - api-reference/text-overlay.md
     - api-reference/compression.md
     - api-reference/object-detection.md
+  
+  - Development:
+    - development/index.md
+    - development/git-flow.md
 
 extra_css:
   - stylesheets/extra.css
