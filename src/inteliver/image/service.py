@@ -1,15 +1,18 @@
 from io import BytesIO
 
 import cv2
+import httpx
 import numpy as np
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from inteliver.image.exceptions import (
     CloudnameNotExistsException,
+    FetchImageURLException,
     ImageDecodeException,
     ImageProcessorException,
 )
 from inteliver.image.image_processor import ImageProcessor
+from inteliver.image.schemas import ImageSource
 from inteliver.storage.service import StorageService
 from inteliver.users.exceptions import UserNotFoundException
 from inteliver.users.service import UserService
@@ -21,7 +24,8 @@ class ImageService:
         db: AsyncSession,
         cloudname: str,
         commands: str,
-        object_key: str,
+        uri: str,
+        image_source: ImageSource,
     ):
         """
         Process an image with specified commands.
@@ -29,7 +33,7 @@ class ImageService:
         Args:
             cloudname (str): The user's cloud name.
             commands (str): The commands to apply to the image.
-            object_key (str): The key of the resource.
+            uri (str): The url or object key of the image.
             db (AsyncSession): The database session.
 
         Returns:
@@ -63,13 +67,13 @@ class ImageService:
 
         # TODO get user active storage endpoint
         # currently we only have one main s3 storage endpoint
-
+        image_retreivers = {
+            ImageSource.S3: StorageService.retrieve_image_by_cloudname,
+            ImageSource.HTTP: ImageService.retrieve_image_by_url,
+        }
         # Fetch the image from MinIO
-        data, headers = await StorageService.retrieve_image_by_cloudname(
-            cloudname, object_key
-        )
+        data, headers = await image_retreivers[image_source](cloudname, uri)
         image_format = str(headers.get("Content-Type"))
-
         # Convert image to numpy
         image = ImageService._convert_bytes_to_numpy(data)
 
@@ -183,3 +187,35 @@ class ImageService:
                 detail=f"Can not decode image data (cv2): {str(e)}"
             )
         return image
+
+    @staticmethod
+    async def retrieve_image_by_url(
+        cloudname: str,
+        image_url: str,
+    ) -> tuple[BytesIO, dict]:
+        """
+        Retrieve an image from the web using a URL.
+
+        Args:
+            image_url (str): The URL of the image to retrieve.
+            cloudname (str): The user cloudname.
+
+        Returns:
+            tuple[BytesIO, dict]: The retrieved image binary data and its headers.
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(image_url)
+                response.raise_for_status()  # Ensure the request was successful
+
+                # Get the image content and headers
+                image_data = BytesIO(response.content)
+                headers = dict(response.headers)
+
+                return image_data, headers
+
+        except httpx.HTTPStatusError as e:
+            # logger.error(f"Error fetching image from {image_url}: {e}")
+            raise FetchImageURLException(f"Error fetching image: {e}")
+        except Exception as e:
+            raise FetchImageURLException(f"Error fetching image: {e}")

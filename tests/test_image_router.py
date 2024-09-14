@@ -108,7 +108,7 @@ async def test_image_processing_success(
 ):
     """Test the process_image endpoint."""
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/s3/{uploaded_image.object_key}"
     )
     print(response.headers["content-type"])
     assert response.status_code == status.HTTP_200_OK
@@ -125,7 +125,7 @@ async def test_test_image_processing_invalid_command(
     """Test the process_image endpoint."""
     invaild_command = "invalid_command"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invaild_command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invaild_command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -139,7 +139,7 @@ async def test_test_image_processing_invalid_command_operation(
     """Test the process_image endpoint."""
     invaild_command = "i_h_200,i_w_200,i_o_invalid"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invaild_command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invaild_command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -153,7 +153,7 @@ async def test_test_image_processing_non_existing_cloudname(
     non_existing_cloudname = "non_existing_cloudname"
     command = "i_h_200,i_w_200,i_o_resize"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{non_existing_cloudname}/{command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{non_existing_cloudname}/{command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -167,7 +167,7 @@ async def test_test_image_processing_invalid_int_arg(
     """Test the process_image endpoint."""
     invalid_command = "i_h_200,i_w_ten,i_o_resize"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -181,7 +181,7 @@ async def test_test_image_processing_invalid_int_arg(
     """Test the process_image endpoint."""
     invalid_command = "i_h_200,i_w_ten,i_o_resize"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -195,7 +195,7 @@ async def test_test_image_processing_invalid_float_arg(
     """Test the process_image endpoint."""
     invalid_command = "i_h_200,i_w_1.ten,i_o_resize"
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{invalid_command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -230,7 +230,7 @@ async def test_image_processing_face_success(
 ):
     """Test the process_image endpoint."""
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/{uploaded_image_face.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/s3/{uploaded_image_face.object_key}"
     )
     print(response.headers["content-type"])
     assert response.status_code == status.HTTP_200_OK
@@ -271,6 +271,6 @@ async def test_test_image_processing_insufficient_command_arg(
 ):
     """Test the process_image endpoint."""
     response = await test_client.get(
-        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/{uploaded_image.object_key}"
+        f"{settings.api_prefix}/image/{pre_existing_user.cloudname}/{command}/s3/{uploaded_image.object_key}"
     )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
